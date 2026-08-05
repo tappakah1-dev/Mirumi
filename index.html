@@ -698,7 +698,7 @@
                                 <span><i class="fa-solid fa-wand-magic-sparkles text-brand-hotPink"></i> Gemini AI Prompt</span>
                                 <span class="text-[10px] bg-brand-pink/20 text-brand-hotPink px-2 py-0.5 rounded-full font-bold">Mirumi Character Locked</span>
                             </div>
-                            <textarea id="gemini-prompt-input" rows="3" placeholder="Describe Mirumi's setting or activity... e.g. drinking boba tea in Shibuya with Solana coins raining from sky" class="w-full bg-white border border-pink-200 rounded-xl p-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-pink resize-none shadow-sm"></textarea>
+                            <textarea id="gemini-prompt-input" rows="3" placeholder="Describe Mirumi's setting or activity... e.g. holding a Solana coin on a rocket to the moon" class="w-full bg-white border border-pink-200 rounded-xl p-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-pink resize-none shadow-sm"></textarea>
                             
                             <button id="gemini-gen-btn" onclick="generateGeminiMemeImage()" class="w-full bg-gradient-to-r from-brand-pink to-brand-hotPink hover:from-brand-hotPink hover:to-rose-600 text-white font-bold py-2.5 px-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-xs">
                                 <i id="gemini-spinner" class="fa-solid fa-spinner fa-spin hidden"></i>
@@ -1245,7 +1245,7 @@
 
         // Gemini AI Image Generator
         async function generateGeminiMemeImage() {
-            const promptInput = document.getElementById('gemini-prompt-input').value.trim() || "drinking boba tea in Shibuya Tokyo with Solana coins raining from sky";
+            const promptInput = document.getElementById('gemini-prompt-input').value.trim() || "holding a glowing Solana coin on a rocket ship blasting to the moon, crypto trading charts in the background";
             const btn = document.getElementById('gemini-gen-btn');
             const spinner = document.getElementById('gemini-spinner');
             const indicator = document.getElementById('ai-status-indicator');

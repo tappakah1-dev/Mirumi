@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Photorealistic Garden Studio Configurator</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Three.js & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    
+    /* Custom Scrollbar for Sidebar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #18181b; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #22c55e;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+      border: 2px solid #ffffff;
+    }
+
+    .glazing-filter-btn.active, .wall-select-btn.active {
+      background-color: #22c55e;
+      color: #09090b;
+      font-weight: 700;
+      border-color: #22c55e;
+    }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 h-screen w-screen overflow-hidden flex flex-col md:flex-row select-none">
+
+  <!-- Left/Main Control Sidebar -->
+  <aside class="w-full md:w-96 lg:w-[420px] bg-zinc-900 border-r border-zinc-800 flex flex-col h-1/2 md:h-full z-20 shadow-2xl shrink-0">
+    
+    <!-- Header -->
+    <div class="p-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/90 backdrop-blur">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold shadow-inner">
+          <i class="fa-solid fa-house-laptop text-base"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-sm text-zinc-100 tracking-wide uppercase">Garden Room Studio</h1>
+          <p class="text-[11px] text-zinc-400">UK Standard Spec 3D Planner</p>
+        </div>
+      </div>
+      <button onclick="resetConfiguration()" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg border border-zinc-700 transition flex items-center gap-1.5 cursor-pointer">
+        <i class="fa-solid fa-rotate-right text-[10px]"></i> Reset
+      </button>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-zinc-800 bg-zinc-950/60 text-xs font-medium text-zinc-400">
+      <button onclick="switchTab('dimensions')" id="tab-dimensions" class="tab-btn flex-1 py-3 text-emerald-400 border-b-2 border-emerald-500 bg-zinc-800/40 transition">
+        <i class="fa-solid fa-ruler-combined block mb-1 text-sm"></i> Size
+      </button>
+      <button onclick="switchTab('materials')" id="tab-materials" class="tab-btn flex-1 py-3 hover:text-zinc-200 transition">
+        <i class="fa-solid fa-layer-group block mb-1 text-sm"></i> Cladding
+      </button>
+      <button onclick="switchTab('openings')" id="tab-openings" class="tab-btn flex-1 py-3 hover:text-zinc-200 transition">
+        <i class="fa-solid fa-door-open block mb-1 text-sm"></i> Glazing
+      </button>
+      <button onclick="switchTab('decking')" id="tab-decking" class="tab-btn flex-1 py-3 hover:text-zinc-200 transition">
+        <i class="fa-solid fa-sliders block mb-1 text-sm"></i> Options
+      </button>
+    </div>
+
+    <!-- Scrollable Tab Content Container -->
+    <div class="flex-1 overflow-y-auto p-5 space-y-6">
+
+      <!-- TAB 1: DIMENSIONS -->
+      <div id="content-dimensions" class="tab-content space-y-5">
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Room Width (External)</label>
+            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30" id="val-width">4.50 m</span>
+          </div>
+          <input type="range" id="input-width" min="2.5" max="8.0" step="0.25" value="4.5" class="w-full range-slider bg-zinc-800 h-2 rounded-lg appearance-none">
+          <div class="flex justify-between text-[10px] text-zinc-500 mt-1"><span>2.5m</span><span>5.0m</span><span>8.0m</span></div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Room Depth (External)</label>
+            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30" id="val-depth">3.50 m</span>
+          </div>
+          <input type="range" id="input-depth" min="2.5" max="6.0" step="0.25" value="3.5" class="w-full range-slider bg-zinc-800 h-2 rounded-lg appearance-none">
+          <div class="flex justify-between text-[10px] text-zinc-500 mt-1"><span>2.5m</span><span>4.0m</span><span>6.0m</span></div>
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Overall Height</label>
+            <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30" id="val-height">2.74 m</span>
+          </div>
+          <input type="range" id="input-height" min="2.2" max="3.2" step="0.05" value="2.74" class="w-full range-slider bg-zinc-800 h-2 rounded-lg appearance-none">
+          <p class="text-[11px] text-zinc-400 mt-2 flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-emerald-400"></i> Standard 2.5m-2.8m exterior height suitable for UK Permitted Development.</p>
+        </div>
+
+        <hr class="border-zinc-800">
+
+        <!-- Roof Overhang & Style -->
+        <div class="space-y-3">
+          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Roof Architecture</label>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button onclick="setRoofType('flat')" id="roof-flat" class="roof-btn p-3 rounded-xl border border-emerald-500 bg-emerald-500/10 text-left transition">
+              <div class="font-semibold text-xs text-zinc-100">Modern Pent / Flat Roof</div>
+              <div class="text-[10px] text-zinc-400 mt-0.5">Deep black fascia trim overhang</div>
+            </button>
+            <button onclick="setRoofType('pitched')" id="roof-pitched" class="roof-btn p-3 rounded-xl border border-zinc-800 bg-zinc-800/40 hover:border-zinc-700 text-left transition">
+              <div class="font-semibold text-xs text-zinc-100">Apex Dual Pitch</div>
+              <div class="text-[10px] text-zinc-400 mt-0.5">Traditional vaulted roof gable</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <div class="flex justify-between items-center mb-2">
+            <label class="text-xs font-semibold text-zinc-300 uppercase tracking-wider">Roof Side Overhang</label>
+            <span class="text-xs font-medium text-zinc-300" id="val-overhang">0.40 m</span>
+          </div>
+          <input type="range" id="input-overhang" min="0.1" max="0.8" step="0.05" value="0.4" class="w-full range-slider bg-zinc-800 h-2 rounded-lg appearance-none">
+        </div>
+      </div>
+
+      <!-- TAB 2: CLADDING & FINISHES -->
+      <div id="content-materials" class="tab-content hidden space-y-4">
+        <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Exterior Cladding Material</label>
+        
+        <div class="grid grid-cols-1 gap-2.5">
+          <button onclick="setCladding('cedar')" id="clad-cedar" class="clad-btn active p-3 rounded-xl border border-emerald-500 bg-emerald-500/10 flex items-center space-x-3 text-left transition">
+            <div class="w-9 h-9 rounded-lg bg-amber-700 border border-amber-500 flex-shrink-0 shadow-inner"></div>
+            <div class="flex-1">
+              <div class="font-semibold text-xs text-zinc-100">Natural Western Red Cedar</div>
+              <div class="text-[11px] text-zinc-400">Vertical slatted architectural planks</div>
+            </div>
+            <span class="text-xs text-emerald-400 font-bold">+£0</span>
+          </button>
+
+          <button onclick="setCladding('oak')" id="clad-oak" class="clad-btn p-3 rounded-xl border border-zinc-800 bg-zinc-800/40 hover:border-zinc-700 flex items-center space-x-3 text-left transition">
+            <div class="w-9 h-9 rounded-lg bg-amber-800 border border-amber-600 flex-shrink-0 shadow-inner"></div>
+            <div class="flex-1">
+              <div class="font-semibold text-xs text-zinc-100">Warm Honey Oak Cladding</div>
+              <div class="text-[11px] text-zinc-400">Premium treated vertical timber</div>
+            </div>
+            <span class="text-xs text-zinc-400">+£12/m²</span>
+          </button>
+
+          <button onclick="setCladding('composite')" id="clad-composite" class="clad-btn p-3 rounded-xl border border-zinc-800 bg-zinc-800/40 hover:border-zinc-700 flex items-center space-x-3 text-left transition">
+            <div class="w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-600 flex-shrink-0 shadow-inner"></div>
+            <div class="flex-1">
+              <div class="font-semibold text-xs text-zinc-100">Anthracite Composite Slats</div>
+              <div class="text-[11px] text-zinc-400">Zero-maintenance charcoal composite</div>
+            </div>
+            <span class="text-xs text-zinc-400">+£35/m²</span>
+          </button>
+
+          <button onclick="setCladding('render')" id="clad-render" class="clad-btn p-3 rounded-xl border border-zinc-800 bg-zinc-800/40 hover:border-zinc-700 flex items-center space-x-3 text-left transition">
+            <div class="w-9 h-9 rounded-lg bg-slate-200 border border-white flex-shrink-0 shadow-inner"></div>
+            <div class="flex-1">
+              <div class="font-semibold text-xs text-zinc-100">Crisp White Silicone Render</div>
+              <div class="text-[11px] text-zinc-400">Smooth modern monochrome exterior</div>
+            </div>
+            <span class="text-xs text-zinc-400">+£25/m²</span>
+          </button>
+        </div>
+
+        <hr class="border-zinc-800 my-4">
+
+        <div>
+          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-2.5">Window & Trim Frame Color</label>
+          <div class="flex space-x-3">
+            <button onclick="setFrameColor('#18181b')" class="flex items-center space-x-2 px-3 py-2 rounded-xl bg-zinc-900 border border-emerald-500 text-xs text-zinc-200">
+              <span class="w-4 h-4 rounded-full bg-zinc-900 border border-zinc-600 inline-block"></span>
+              <span>Anthracite (RAL 7016)</span>
+            </button>
+            <button onclick="setFrameColor('#27272a')" class="flex items-center space-x-2 px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-400 hover:text-zinc-200">
+              <span class="w-4 h-4 rounded-full bg-zinc-800 border border-zinc-600 inline-block"></span>
+              <span>Matt Black (RAL 9005)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: DOORS & WINDOWS (UK Standard Sizes) -->
+      <div id="content-openings" class="tab-content hidden space-y-4">
+        
+        <!-- Target Wall Selector for New Openings -->
+        <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-semibold text-emerald-400 uppercase tracking-wider block">Target Wall for New Glazing</label>
+            <span class="text-[10px] text-zinc-400">Select wall to add onto</span>
+          </div>
+          <div class="grid grid-cols-4 gap-1.5 text-xs">
+            <button onclick="setTargetWall('front')" id="wall-btn-front" class="wall-select-btn active py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-center transition font-medium">Front</button>
+            <button onclick="setTargetWall('left')" id="wall-btn-left" class="wall-select-btn py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-400 text-center transition font-medium">Left</button>
+            <button onclick="setTargetWall('right')" id="wall-btn-right" class="wall-select-btn py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-400 text-center transition font-medium">Right</button>
+            <button onclick="setTargetWall('back')" id="wall-btn-back" class="wall-select-btn py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-400 text-center transition font-medium">Back</button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Standard UK Glazing</label>
+          <span class="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md font-mono">UK Standard Apertures</span>
+        </div>
+
+        <!-- Glazing Filter Tabs -->
+        <div class="grid grid-cols-3 gap-1 bg-zinc-950 p-1 rounded-xl text-[11px] border border-zinc-800">
+          <button onclick="filterGlazingCategory('bifold')" id="glazing-cat-bifold" class="glazing-filter-btn active py-1.5 rounded-lg text-center transition">Bifolds & Sliders</button>
+          <button onclick="filterGlazingCategory('doors')" id="glazing-cat-doors" class="glazing-filter-btn py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 text-center transition">French & Single</button>
+          <button onclick="filterGlazingCategory('windows')" id="glazing-cat-windows" class="glazing-filter-btn py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 text-center transition">Windows</button>
+        </div>
+
+        <!-- Glazing Option Grid -->
+        <div class="grid grid-cols-2 gap-2.5" id="glazing-options-grid">
+
+          <!-- BIFOLDS & SLIDERS -->
+          <button onclick="addOpening('bifold-180')" data-cat="bifold" class="glazing-option-card p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-door-open text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">2 Panels</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">1.8m Bifold Door</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">1800 x 2100mm • £1,850</div>
+          </button>
+
+          <button onclick="addOpening('bifold-240')" data-cat="bifold" class="glazing-option-card p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-door-open text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">3 Panels</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">2.4m Bifold Door</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">2400 x 2100mm • £2,100</div>
+          </button>
+
+          <button onclick="addOpening('bifold-wide')" data-cat="bifold" class="glazing-option-card p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-door-open text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">3 Wide</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">2.8m Wide Bifold</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">2800 x 2100mm • £2,450</div>
+          </button>
+
+          <button onclick="addOpening('bifold-360')" data-cat="bifold" class="glazing-option-card p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-door-open text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">4 Panels</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">3.6m Grand Bifold</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">3600 x 2100mm • £3,100</div>
+          </button>
+
+          <button onclick="addOpening('sliding-180')" data-cat="bifold" class="glazing-option-card p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-table-columns text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">2 Track</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">1.8m Sliding Patio</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">1800 x 2100mm • £1,550</div>
+          </button>
+
+          <button onclick="addOpening('sliding-210')" data-cat="bifold" class="glazing-option-card p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-table-columns text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">2 Track</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">2.1m Sliding Patio</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">2100 x 2100mm • £1,750</div>
+          </button>
+
+          <button onclick="addOpening('sliding-240')" data-cat="bifold" class="glazing-option-card p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-table-columns text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">2 Track</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">2.4m Sliding Patio</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">2400 x 2100mm • £1,950</div>
+          </button>
+
+          <!-- FRENCH & SINGLE DOORS -->
+          <button onclick="addOpening('single-door')" data-cat="doors" class="glazing-option-card hidden p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-door-closed text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">Single</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">0.9m Single Access Door</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">900 x 2100mm • £780</div>
+          </button>
+
+          <button onclick="addOpening('french-150')" data-cat="doors" class="glazing-option-card hidden p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-kaaba text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">Double</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">1.5m French Doors</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">1500 x 2100mm • £1,280</div>
+          </button>
+
+          <button onclick="addOpening('french-180')" data-cat="doors" class="glazing-option-card hidden p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-kaaba text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">Double</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">1.8m French Doors</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">1800 x 2100mm • £1,420</div>
+          </button>
+
+          <!-- WINDOWS -->
+          <button onclick="addOpening('window-high-120')" data-cat="windows" class="glazing-option-card hidden p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-border-top-left text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">Transom</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">1.2m Clerestory Window</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">1200 x 500mm • £480</div>
+          </button>
+
+          <button onclick="addOpening('window-high-180')" data-cat="windows" class="glazing-option-card hidden p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-border-top-left text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">Transom</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">1.8m Desk High Window</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">1800 x 500mm • £580</div>
+          </button>
+
+          <button onclick="addOpening('window-casement-60')" data-cat="windows" class="glazing-option-card hidden p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-regular fa-square text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">Casement</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">0.6m Slim Casement</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">600 x 1050mm • £390</div>
+          </button>
+
+          <button onclick="addOpening('window-casement-120')" data-cat="windows" class="glazing-option-card hidden p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-regular fa-square text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">Casement</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">1.2m Double Casement</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">1200 x 1050mm • £510</div>
+          </button>
+
+          <button onclick="addOpening('window-tall-60')" data-cat="windows" class="glazing-option-card hidden p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-grip-lines-vertical text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">Full Height</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">0.6m Picture Light</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">600 x 2100mm • £490</div>
+          </button>
+
+          <button onclick="addOpening('window-tall-80')" data-cat="windows" class="glazing-option-card hidden p-2.5 bg-zinc-800/60 border border-zinc-700 hover:border-emerald-500 rounded-xl text-left transition group cursor-pointer">
+            <div class="flex justify-between items-start">
+              <i class="fa-solid fa-grip-lines-vertical text-emerald-400 text-base mb-1 group-hover:scale-110 transition-transform"></i>
+              <span class="text-[9px] font-mono bg-zinc-900 text-zinc-400 px-1.5 py-0.5 rounded">Full Height</span>
+            </div>
+            <div class="font-semibold text-xs text-zinc-100">0.8m Full Height Glazing</div>
+            <div class="text-[10px] text-zinc-400 mt-0.5">800 x 2100mm • £590</div>
+          </button>
+
+        </div>
+
+        <p class="text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 p-2.5 rounded-xl flex items-center gap-2">
+          <i class="fa-solid fa-hand-pointer text-xs"></i>
+          <span><strong>3D Interactive Positioning:</strong> Click any window or door in 3D to drag it horizontally OR vertically up and down!</span>
+        </p>
+
+        <hr class="border-zinc-800">
+
+        <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Installed Glazing & Placement</label>
+        <div id="placed-openings-list" class="space-y-3">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- TAB 4: EXTRAS & DECKING -->
+      <div id="content-decking" class="tab-content hidden space-y-4">
+        <label class="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Veranda & Accessories</label>
+
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between p-3 bg-zinc-800/40 border border-zinc-800 rounded-xl">
+            <div>
+              <div class="font-semibold text-xs text-zinc-200">Front Decking Step</div>
+              <div class="text-[11px] text-zinc-400">1.2m Timber composite platform</div>
+            </div>
+            <input type="checkbox" id="check-decking" checked onchange="toggleDecking()" class="w-5 h-5 accent-emerald-500 rounded cursor-pointer">
+          </div>
+
+          <div class="flex items-center justify-between p-3 bg-zinc-800/40 border border-zinc-800 rounded-xl">
+            <div>
+              <div class="font-semibold text-xs text-zinc-200">Show Interior Office Setup</div>
+              <div class="text-[11px] text-zinc-400">Display desk, laptop & executive chair</div>
+            </div>
+            <input type="checkbox" id="check-interior-furniture" checked onchange="toggleFurniture()" class="w-5 h-5 accent-emerald-500 rounded cursor-pointer">
+          </div>
+
+          <div class="flex items-center justify-between p-3 bg-zinc-800/40 border border-zinc-800 rounded-xl">
+            <div>
+              <div class="font-semibold text-xs text-zinc-200">Show 3D Dimension Guidelines</div>
+              <div class="text-[11px] text-zinc-400">Display width, depth & height annotations</div>
+            </div>
+            <input type="checkbox" id="check-dimensions" checked onchange="toggleDimensionsOverlay()" class="w-5 h-5 accent-emerald-500 rounded cursor-pointer">
+          </div>
+
+          <div class="flex items-center justify-between p-3 bg-zinc-800/40 border border-zinc-800 rounded-xl">
+            <div>
+              <div class="font-semibold text-xs text-zinc-200">Interior Floor Heating</div>
+              <div class="text-[11px] text-zinc-400">Electric foil heating system</div>
+            </div>
+            <input type="checkbox" id="check-heating" onchange="calculatePrice()" class="w-5 h-5 accent-emerald-500 rounded cursor-pointer">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Summary & Price -->
+    <div class="p-4 bg-zinc-950 border-t border-zinc-800 space-y-3 shrink-0">
+      <div class="flex items-baseline justify-between">
+        <div>
+          <div class="text-[10px] text-zinc-400 uppercase tracking-wider font-bold">Estimated Cost</div>
+          <div class="text-2xl font-black text-emerald-400" id="price-total">£13,850</div>
+        </div>
+        <div class="text-right">
+          <span class="text-[11px] text-zinc-500">Excl. VAT & Base</span>
+          <div class="text-xs text-zinc-300 font-semibold" id="price-sqm">£879 / m²</div>
+        </div>
+      </div>
+
+      <button onclick="openQuoteModal()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold rounded-xl transition flex items-center justify-center space-x-2 shadow-lg shadow-emerald-500/20 active:scale-[0.99] cursor-pointer">
+        <i class="fa-solid fa-file-pdf"></i>
+        <span class="text-xs">Download PDF Specs & Quote</span>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- Main Viewport Area -->
+  <main class="flex-1 relative h-1/2 md:h-full bg-slate-200 overflow-hidden" id="canvas-container">
+    
+    <!-- 3D Canvas -->
+    <canvas id="canvas3d" class="w-full h-full block outline-none cursor-grab active:cursor-grabbing"></canvas>
+
+    <!-- Interactive Overlay for Popups & Editable Dimensions -->
+    <div id="opening-overlay-container" class="absolute inset-0 pointer-events-none z-20"></div>
+
+    <!-- Top Toolbar overlay -->
+    <div class="absolute top-4 left-4 right-4 flex justify-between items-center pointer-events-none z-10">
+      
+      <!-- Camera Angle Presets -->
+      <div class="flex bg-white/90 backdrop-blur border border-slate-300/80 rounded-xl p-1 shadow-lg pointer-events-auto space-x-1 text-slate-800">
+        <button onclick="setCameraView('3d')" class="cam-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500 text-white shadow-sm cursor-pointer">
+          <i class="fa-solid fa-cube mr-1"></i> 3D View
+        </button>
+        <button onclick="setCameraView('top')" class="cam-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">
+          <i class="fa-solid fa-border-all mr-1"></i> 2D Plan
+        </button>
+        <button onclick="setCameraView('front')" class="cam-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">
+          <i class="fa-solid fa-vector-square mr-1"></i> Elevation
+        </button>
+        <button onclick="setCameraView('interior')" class="cam-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer">
+          <i class="fa-solid fa-eye mr-1"></i> Inside
+        </button>
+      </div>
+
+      <!-- Sun Control -->
+      <div class="bg-white/90 backdrop-blur border border-slate-300/80 rounded-xl p-1.5 shadow-lg pointer-events-auto flex items-center space-x-2 px-3 text-slate-700">
+        <i class="fa-solid fa-sun text-amber-500 text-xs"></i>
+        <span class="text-xs font-medium text-slate-600">Sun Position</span>
+        <input type="range" id="sun-slider" min="0" max="6.28" step="0.1" value="1.2" class="w-20 range-slider bg-slate-200 h-1.5 rounded-lg appearance-none">
+      </div>
+    </div>
+
+    <!-- Footprint Badge -->
+    <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur border border-slate-300 px-3.5 py-2 rounded-xl text-xs text-slate-700 pointer-events-none shadow-lg flex items-center space-x-3 z-10 font-medium">
+      <div>Area: <span id="badge-area" class="text-emerald-600 font-bold">15.75 m²</span></div>
+      <div class="text-slate-300">|</div>
+      <div>Footprint: <span id="badge-footprint" class="text-slate-900 font-bold">4.50m × 3.50m</span></div>
+    </div>
+
+  </main>
+
+  <!-- Quote Modal Container -->
+  <div id="quote-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl relative">
+      <button onclick="closeQuoteModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-200 text-lg cursor-pointer">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center space-y-1">
+        <div class="w-12 h-12 bg-emerald-500/20 border border-emerald-500/40 rounded-full flex items-center justify-center text-emerald-400 mx-auto text-xl mb-2">
+          <i class="fa-solid fa-check"></i>
+        </div>
+        <h3 class="text-lg font-bold text-zinc-100">Garden Studio Specification Ready</h3>
+        <p class="text-xs text-zinc-400">Download CAD dimensions & breakdown quote</p>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs text-zinc-400 block mb-1">Full Name</label>
+          <input type="text" placeholder="John Smith" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="text-xs text-zinc-400 block mb-1">Email Address</label>
+          <input type="email" placeholder="john@example.com" class="w-full bg-zinc-800 border border-zinc-700 rounded-lg p-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500">
+        </div>
+      </div>
+
+      <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800 text-xs space-y-1.5 text-zinc-300">
+        <div class="flex justify-between"><span>Building Size:</span><span id="modal-size" class="font-medium text-zinc-100">4.5m x 3.5m</span></div>
+        <div class="flex justify-between"><span>External Material:</span><span id="modal-clad" class="font-medium text-zinc-100">Western Red Cedar</span></div>
+        <div class="flex justify-between text-emerald-400 font-bold pt-1.5 border-t border-zinc-800"><span>Estimated Cost:</span><span id="modal-price">£13,850</span></div>
+      </div>
+
+      <button onclick="submitQuote()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold rounded-xl transition cursor-pointer">
+        Download PDF Quote Sheet
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Procedural High-Res Texture Generator for Photorealistic Materials
+    function createProceduralTexture(type) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 1024;
+      const ctx = canvas.getContext('2d');
+
+      if (type === 'cedar' || type === 'oak') {
+        const baseColor = type === 'cedar' ? '#b86a32' : '#aa6d38';
+        const darkGroove = type === 'cedar' ? '#4a2308' : '#42240b';
+        
+        ctx.fillStyle = baseColor;
+        ctx.fillRect(0, 0, 1024, 1024);
+
+        // Vertical Slats with Shadow Grooves & Wood Grains
+        const slatWidth = 32;
+        for (let x = 0; x < 1024; x += slatWidth) {
+          ctx.fillStyle = darkGroove;
+          ctx.fillRect(x, 0, 3, 1024);
+          
+          ctx.fillStyle = 'rgba(255,255,255,0.15)';
+          ctx.fillRect(x + 3, 0, 2, 1024);
+
+          ctx.fillStyle = 'rgba(0,0,0,0.06)';
+          for (let g = 0; g < 5; g++) {
+            const gx = x + Math.random() * (slatWidth - 6) + 3;
+            ctx.fillRect(gx, 0, 1 + Math.random() * 1.5, 1024);
+          }
+        }
+      } else if (type === 'composite') {
+        ctx.fillStyle = '#1e2124';
+        ctx.fillRect(0, 0, 1024, 1024);
+        for (let x = 0; x < 1024; x += 24) {
+          ctx.fillStyle = '#0c0e10';
+          ctx.fillRect(x, 0, 3, 1024);
+          ctx.fillStyle = 'rgba(255,255,255,0.05)';
+          ctx.fillRect(x + 3, 0, 1, 1024);
+        }
+      } else if (type === 'render') {
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(0, 0, 1024, 1024);
+        for (let i = 0; i < 20000; i++) {
+          ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.04})`;
+          ctx.fillRect(Math.random() * 1024, Math.random() * 1024, 2, 2);
+        }
+      } else if (type === 'interior-floor') {
+        ctx.fillStyle = '#d4a373';
+        ctx.fillRect(0, 0, 1024, 1024);
+        const boardHeight = 64;
+        for (let y = 0; y < 1024; y += boardHeight) {
+          ctx.fillStyle = '#784c1e';
+          ctx.fillRect(0, y, 1024, 2);
+          for (let g = 0; g < 4; g++) {
+            ctx.fillStyle = 'rgba(0,0,0,0.04)';
+            ctx.fillRect(0, y + Math.random() * boardHeight, 1024, 1);
+          }
+        }
+      } else if (type === 'grass-disc') {
+        const grad = ctx.createRadialGradient(512, 512, 50, 512, 512, 500);
+        grad.addColorStop(0, '#86efac');
+        grad.addColorStop(0.4, '#4ade80');
+        grad.addColorStop(0.85, '#22c55e');
+        grad.addColorStop(1, 'rgba(241, 245, 249, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      return texture;
+    }
+
+    const container = document.getElementById('canvas-container');
+    const canvas = document.getElementById('canvas3d');
+
+    function updateCanvasSize() {
+      if (!container || !renderer || !camera) return;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    }
+    window.addEventListener('resize', updateCanvasSize);
+
+    function getPointerPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        y: -((e.clientY - rect.top) / rect.height) * 2 + 1
+      };
+    }
+    
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf1f5f9);
+
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 1000);
+    camera.position.set(8.5, 4.2, 9.5);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI / 2 - 0.02;
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+    scene.add(ambientLight);
+
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xdbeade, 0.7);
+    hemiLight.position.set(0, 30, 0);
+    scene.add(hemiLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.4);
+    sunLight.position.set(12, 18, 14);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.width = 2048;
+    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.bias = -0.0001;
+    const shadowD = 10;
+    sunLight.shadow.camera.left = -shadowD;
+    sunLight.shadow.camera.right = shadowD;
+    sunLight.shadow.camera.top = shadowD;
+    sunLight.shadow.camera.bottom = -shadowD;
+    scene.add(sunLight);
+
+    // Lawn Patch
+    const grassTexture = createProceduralTexture('grass-disc');
+    const groundGeo = new THREE.PlaneGeometry(24, 24);
+    const groundMat = new THREE.MeshBasicMaterial({ map: grassTexture, transparent: true });
+    const groundMesh = new THREE.Mesh(groundGeo, groundMat);
+    groundMesh.rotation.x = -Math.PI / 2;
+    groundMesh.position.y = 0;
+    scene.add(groundMesh);
+
+    const shadowPlaneGeo = new THREE.PlaneGeometry(30, 30);
+    const shadowPlaneMat = new THREE.ShadowMaterial({ opacity: 0.22 });
+    const shadowMesh = new THREE.Mesh(shadowPlaneGeo, shadowPlaneMat);
+    shadowMesh.rotation.x = -Math.PI / 2;
+    shadowMesh.position.y = 0.001;
+    shadowMesh.receiveShadow = true;
+    scene.add(shadowMesh);
+
+    let config = {
+      width: 4.5,
+      depth: 3.5,
+      height: 2.74,
+      overhang: 0.40,
+      roofType: 'flat',
+      cladding: 'cedar',
+      frameColor: '#18181b',
+      showDimensions: true,
+      showFurniture: true,
+      targetWall: 'front', // Wall to add new glazing onto
+      openings: [
+        { id: '1', type: 'bifold-240', wall: 'front', x: 0 },
+        { id: '2', type: 'window-high-120', wall: 'right', x: 0.8, y: 1.95 }
+      ],
+      hasDecking: true,
+      hasHeating: false
+    };
+
+    const textures = {
+      cedar: createProceduralTexture('cedar'),
+      oak: createProceduralTexture('oak'),
+      composite: createProceduralTexture('composite'),
+      render: createProceduralTexture('render'),
+      floor: createProceduralTexture('interior-floor')
+    };
+
+    let roomGroup = new THREE.Group();
+    scene.add(roomGroup);
+
+    let annotationGroup = new THREE.Group();
+    scene.add(annotationGroup);
+
+    let draggableObjects = [];
+    let selectedOpeningId = null;
+    let isMoveModeActive = false;
+    let dimensionAnchors = [];
+    let isEditingDimension = false;
+    let isDraggingOpening = false;
+    let draggedOpeningId = null;
+    let dragWallPlane = new THREE.Plane();
+    let dragPlaneIntersect = new THREE.Vector3();
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    function getOpeningWidth(type) {
+      switch(type) {
+        case 'bifold-180': return 1.8;
+        case 'bifold-240': return 2.4;
+        case 'bifold-wide': return 2.8;
+        case 'bifold-360': return 3.6;
+        case 'sliding-180': return 1.8;
+        case 'sliding-210': return 2.1;
+        case 'sliding-240': return 2.4;
+        case 'french-150': return 1.5;
+        case 'french-180': return 1.8;
+        case 'single-door': return 0.9;
+        case 'window-high-120': return 1.2;
+        case 'window-high-180': return 1.8;
+        case 'window-casement-60': return 0.6;
+        case 'window-casement-120': return 1.2;
+        case 'window-tall-60': return 0.6;
+        case 'window-tall-80': return 0.8;
+        default: return 1.2;
+      }
+    }
+
+    function getOpeningHeight(type) {
+      if (type.startsWith('window-high')) return 0.50; // Clerestory / Transom
+      if (type.startsWith('window-casement')) return 1.05; // Standard UK casement window
+      if (type.startsWith('window-tall')) return 2.10; // Full height picture light
+      return 2.10; // Standard UK Door Height (2100mm)
+    }
+
+    function getOpeningTitle(type) {
+      switch(type) {
+        case 'bifold-180': return '1.8m Bifold Set';
+        case 'bifold-240': return '2.4m Bifold Set';
+        case 'bifold-wide': return '2.8m Bifold Set';
+        case 'bifold-360': return '3.6m Bifold Set';
+        case 'sliding-180': return '1.8m Sliding Patio';
+        case 'sliding-210': return '2.1m Sliding Patio';
+        case 'sliding-240': return '2.4m Sliding Patio';
+        case 'french-150': return '1.5m French Doors';
+        case 'french-180': return '1.8m French Doors';
+        case 'single-door': return '0.9m Single Door';
+        case 'window-high-120': return '1.2m Clerestory Window';
+        case 'window-high-180': return '1.8m Transom Window';
+        case 'window-casement-60': return '0.6m Casement Window';
+        case 'window-casement-120': return '1.2m Casement Window';
+        case 'window-tall-60': return '0.6m Picture Window';
+        case 'window-tall-80': return '0.8m Picture Window';
+        default: return 'Glazing Unit';
+      }
+    }
+
+    function getOpeningYPosition(op) {
+      if (typeof op === 'object' && op.y !== undefined) return op.y;
+      const type = typeof op === 'object' ? op.type : op;
+      if (type.startsWith('window-high')) return 1.95; // Mounted high near soffit
+      if (type.startsWith('window-casement')) return 1.35; // Standard cill height ~850mm above finished floor
+      if (type.startsWith('window-tall')) return 1.25; // Floor-aligned tall window
+      return 0.20 + getOpeningHeight(type)/2; // Floor aligned doors
+    }
+
+    function build3DRoom() {
+      while(roomGroup.children.length > 0) roomGroup.remove(roomGroup.children[0]);
+      while(annotationGroup.children.length > 0) annotationGroup.remove(annotationGroup.children[0]);
+      draggableObjects = [];
+
+      const w = config.width;
+      const d = config.depth;
+      const h = config.height;
+      const wallThick = 0.16;
+
+      const activeCladTex = textures[config.cladding];
+      activeCladTex.repeat.set(w * 0.8, h * 0.6);
+
+      const wallMaterial = new THREE.MeshStandardMaterial({
+        map: activeCladTex,
+        roughness: 0.5,
+        metalness: 0.05
+      });
+
+      const frameMaterial = new THREE.MeshStandardMaterial({
+        color: new THREE.Color(config.frameColor),
+        roughness: 0.25,
+        metalness: 0.8
+      });
+
+      const glassMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        metalness: 0.1,
+        roughness: 0.05,
+        transmission: 0.95,
+        transparent: true,
+        opacity: 1,
+        ior: 1.52,
+        reflectivity: 0.9,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.1,
+        side: THREE.DoubleSide
+      });
+
+      // 1. Foundation Base Step
+      const baseGeo = new THREE.BoxGeometry(w + 0.04, 0.2, d + 0.04);
+      const baseMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.8 });
+      const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+      baseMesh.position.set(0, 0.1, 0);
+      baseMesh.receiveShadow = true;
+      baseMesh.castShadow = true;
+      roomGroup.add(baseMesh);
+
+      // 2. Interior Floorboards
+      const floorGeo = new THREE.PlaneGeometry(w - wallThick, d - wallThick);
+      const floorMat = new THREE.MeshStandardMaterial({ map: textures.floor, roughness: 0.4 });
+      const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+      floorMesh.rotation.x = -Math.PI / 2;
+      floorMesh.position.set(0, 0.201, 0);
+      floorMesh.receiveShadow = true;
+      roomGroup.add(floorMesh);
+
+      // 3. Interior Back & Side Walls Drywall
+      const intWallMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.9 });
+      const intBackGeo = new THREE.PlaneGeometry(w - wallThick*2, h);
+      const intBack = new THREE.Mesh(intBackGeo, intWallMat);
+      intBack.position.set(0, h/2 + 0.2, -d/2 + wallThick + 0.001);
+      roomGroup.add(intBack);
+
+      const intLeftGeo = new THREE.PlaneGeometry(d - wallThick*2, h);
+      const intLeft = new THREE.Mesh(intLeftGeo, intWallMat);
+      intLeft.rotation.y = Math.PI / 2;
+      intLeft.position.set(-w/2 + wallThick + 0.001, h/2 + 0.2, 0);
+      roomGroup.add(intLeft);
+
+      const intRight = intLeft.clone();
+      intRight.rotation.y = -Math.PI / 2;
+      intRight.position.x = w/2 - wallThick - 0.001;
+      roomGroup.add(intRight);
+
+      // 4. Interior Office Setup
+      if (config.showFurniture) {
+        buildInteriorFurniture(w, d, h);
+      }
+
+      // Helper to render segmented wall with cutouts for openings
+      function buildWallWithOpenings(wallName, wallLength, wallX, wallZ, wallRotY) {
+        const wallGroup = new THREE.Group();
+        wallGroup.position.set(wallX, 0, wallZ);
+        wallGroup.rotation.y = wallRotY;
+
+        const wallOpenings = config.openings.filter(o => o.wall === wallName);
+
+        if (wallOpenings.length === 0) {
+          const solidGeo = new THREE.BoxGeometry(wallLength, h, wallThick);
+          const solidWall = new THREE.Mesh(solidGeo, wallMaterial);
+          solidWall.position.set(0, h/2 + 0.2, 0);
+          solidWall.castShadow = true;
+          solidWall.receiveShadow = true;
+          wallGroup.add(solidWall);
+        } else {
+          wallOpenings.sort((a, b) => a.x - b.x);
+
+          let currentX = -wallLength / 2;
+          wallOpenings.forEach(op => {
+            const opWidth = getOpeningWidth(op.type);
+            const opHeight = getOpeningHeight(op.type);
+            const posY = getOpeningYPosition(op);
+            const holeLeft = op.x - opWidth / 2;
+            const holeRight = op.x + opWidth / 2;
+
+            // Left solid segment before hole
+            const segW = holeLeft - currentX;
+            if (segW > 0.05) {
+              const segGeo = new THREE.BoxGeometry(segW, h, wallThick);
+              const segMesh = new THREE.Mesh(segGeo, wallMaterial);
+              segMesh.position.set(currentX + segW / 2, h / 2 + 0.2, 0);
+              segMesh.castShadow = true;
+              segMesh.receiveShadow = true;
+              wallGroup.add(segMesh);
+            }
+
+            // Top Lintel and Bottom Wall (for windows)
+            const holeBottomY = posY - opHeight/2;
+            const holeTopY = posY + opHeight/2;
+
+            // Lower wall under window
+            const lowerH = holeBottomY - 0.2;
+            if (lowerH > 0.05) {
+              const lowGeo = new THREE.BoxGeometry(opWidth, lowerH, wallThick);
+              const lowMesh = new THREE.Mesh(lowGeo, wallMaterial);
+              lowMesh.position.set(op.x, 0.2 + lowerH / 2, 0);
+              lowMesh.castShadow = true;
+              wallGroup.add(lowMesh);
+            }
+
+            // Upper lintel above window/door
+            const upperH = (h + 0.2) - holeTopY;
+            if (upperH > 0.05) {
+              const upGeo = new THREE.BoxGeometry(opWidth, upperH, wallThick);
+              const upMesh = new THREE.Mesh(upGeo, wallMaterial);
+              upMesh.position.set(op.x, h + 0.2 - upperH / 2, 0);
+              upMesh.castShadow = true;
+              wallGroup.add(upMesh);
+            }
+
+            currentX = holeRight;
+          });
+
+          // Final right wall segment
+          const finalW = (wallLength / 2) - currentX;
+          if (finalW > 0.05) {
+            const finalGeo = new THREE.BoxGeometry(finalW, h, wallThick);
+            const finalMesh = new THREE.Mesh(finalGeo, wallMaterial);
+            finalMesh.position.set(currentX + finalW / 2, h / 2 + 0.2, 0);
+            finalMesh.castShadow = true;
+            finalMesh.receiveShadow = true;
+            wallGroup.add(finalMesh);
+          }
+        }
+
+        roomGroup.add(wallGroup);
+      }
+
+      // Build Exterior Walls
+      buildWallWithOpenings('front', w, 0, d / 2 - wallThick / 2, 0);
+      buildWallWithOpenings('back', w, 0, -d / 2 + wallThick / 2, Math.PI);
+      buildWallWithOpenings('left', d, -w / 2 + wallThick / 2, 0, -Math.PI / 2);
+      buildWallWithOpenings('right', d, w / 2 - wallThick / 2, 0, Math.PI / 2);
+
+      // Black Corner Posts
+      const postGeo = new THREE.BoxGeometry(0.08, h, 0.08);
+      [
+        [-w/2 + 0.02, d/2 - 0.02],
+        [w/2 - 0.02, d/2 - 0.02],
+        [-w/2 + 0.02, -d/2 + 0.02],
+        [w/2 - 0.02, -d/2 + 0.02]
+      ].forEach(pos => {
+        const post = new THREE.Mesh(postGeo, frameMaterial);
+        post.position.set(pos[0], h/2 + 0.2, pos[1]);
+        roomGroup.add(post);
+      });
+
+      // Place Glazing Assemblies
+      config.openings.forEach(op => {
+        const opGroup = new THREE.Group();
+        const doorW = getOpeningWidth(op.type);
+        const doorH = getOpeningHeight(op.type);
+        const frameThick = 0.06;
+
+        // Outer Metallic Box Frame
+        const topBar = new THREE.Mesh(new THREE.BoxGeometry(doorW, frameThick, 0.16), frameMaterial);
+        topBar.position.y = doorH / 2 - frameThick / 2;
+
+        const bottomBar = new THREE.Mesh(new THREE.BoxGeometry(doorW, frameThick, 0.16), frameMaterial);
+        bottomBar.position.y = -doorH / 2 + frameThick / 2;
+
+        const leftBar = new THREE.Mesh(new THREE.BoxGeometry(frameThick, doorH, 0.16), frameMaterial);
+        leftBar.position.x = -doorW / 2 + frameThick / 2;
+
+        const rightBar = new THREE.Mesh(new THREE.BoxGeometry(frameThick, doorH, 0.16), frameMaterial);
+        rightBar.position.x = doorW / 2 - frameThick / 2;
+
+        opGroup.add(topBar, bottomBar, leftBar, rightBar);
+
+        // Panel Inner Mullions & Panes
+        if (op.type.startsWith('bifold')) {
+          let numPanels = 2;
+          if (op.type === 'bifold-240' || op.type === 'bifold-wide') numPanels = 3;
+          if (op.type === 'bifold-360') numPanels = 4;
+
+          const panelW = (doorW - frameThick * 2) / numPanels;
+          for (let i = 0; i < numPanels; i++) {
+            const px = -doorW/2 + frameThick + panelW * i + panelW/2;
+            const pane = new THREE.Mesh(new THREE.BoxGeometry(panelW - 0.06, doorH - 0.12, 0.02), glassMaterial);
+            pane.position.set(px, 0, 0);
+
+            const pBorderLeft = new THREE.Mesh(new THREE.BoxGeometry(0.04, doorH - 0.1, 0.06), frameMaterial);
+            pBorderLeft.position.set(px - panelW/2 + 0.02, 0, 0);
+
+            const pBorderRight = new THREE.Mesh(new THREE.BoxGeometry(0.04, doorH - 0.1, 0.06), frameMaterial);
+            pBorderRight.position.set(px + panelW/2 - 0.02, 0, 0);
+
+            opGroup.add(pane, pBorderLeft, pBorderRight);
+          }
+
+          const handleMat = new THREE.MeshStandardMaterial({ color: 0xd4d4d8, metalness: 0.9, roughness: 0.1 });
+          const handle = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.3, 0.06), handleMat);
+          handle.position.set(0.05, -0.1, 0.06);
+          opGroup.add(handle);
+
+        } else if (op.type.startsWith('sliding')) {
+          const panelW = (doorW - frameThick * 2) / 2;
+          // Fixed & Sliding Pane Offset
+          const pane1 = new THREE.Mesh(new THREE.BoxGeometry(panelW, doorH - 0.12, 0.02), glassMaterial);
+          pane1.position.set(-panelW/2 + 0.02, 0, -0.02);
+          const pane2 = new THREE.Mesh(new THREE.BoxGeometry(panelW, doorH - 0.12, 0.02), glassMaterial);
+          pane2.position.set(panelW/2 - 0.02, 0, 0.02);
+
+          const midMullion = new THREE.Mesh(new THREE.BoxGeometry(0.05, doorH - 0.1, 0.08), frameMaterial);
+          midMullion.position.set(0, 0, 0);
+
+          opGroup.add(pane1, pane2, midMullion);
+
+        } else if (op.type.startsWith('french')) {
+          const panelW = (doorW - frameThick * 2) / 2;
+          const glass1 = new THREE.Mesh(new THREE.BoxGeometry(panelW - 0.06, doorH - 0.12, 0.02), glassMaterial);
+          glass1.position.set(-panelW/2, 0, 0);
+          const glass2 = new THREE.Mesh(new THREE.BoxGeometry(panelW - 0.06, doorH - 0.12, 0.02), glassMaterial);
+          glass2.position.set(panelW/2, 0, 0);
+
+          const centerMullion = new THREE.Mesh(new THREE.BoxGeometry(0.04, doorH - 0.1, 0.08), frameMaterial);
+          centerMullion.position.set(0, 0, 0);
+
+          const handleMat = new THREE.MeshStandardMaterial({ color: 0xd4d4d8, metalness: 0.9, roughness: 0.1 });
+          const handle1 = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.25, 0.06), handleMat);
+          handle1.position.set(-0.04, -0.05, 0.06);
+          const handle2 = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.25, 0.06), handleMat);
+          handle2.position.set(0.04, -0.05, 0.06);
+
+          opGroup.add(glass1, glass2, centerMullion, handle1, handle2);
+
+        } else {
+          // Standard Single Windows / Single Doors
+          const glass = new THREE.Mesh(new THREE.BoxGeometry(doorW - 0.1, doorH - 0.1, 0.02), glassMaterial);
+          opGroup.add(glass);
+
+          if (op.type === 'single-door') {
+            const handleMat = new THREE.MeshStandardMaterial({ color: 0xd4d4d8, metalness: 0.9, roughness: 0.1 });
+            const handle = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.25, 0.06), handleMat);
+            handle.position.set(doorW/2 - 0.12, -0.05, 0.06);
+            opGroup.add(handle);
+          }
+        }
+
+        // Add Cill Threshold step for doors
+        if (!op.type.startsWith('window')) {
+          const stepGeo = new THREE.BoxGeometry(doorW + 0.1, 0.05, 0.22);
+          const stepMesh = new THREE.Mesh(stepGeo, frameMaterial);
+          stepMesh.position.set(0, -doorH/2 - 0.025, 0.05);
+          opGroup.add(stepMesh);
+        }
+
+        // Selection & Drag Hitbox
+        const isSelected = (selectedOpeningId === op.id);
+        const hitBoxGeo = new THREE.BoxGeometry(doorW, doorH + 0.1, 0.35);
+        const hitBoxMat = new THREE.MeshStandardMaterial({
+          color: isSelected ? 0x22c55e : 0x3b82f6,
+          transparent: true,
+          opacity: isSelected ? 0.25 : 0.05,
+          wireframe: true
+        });
+        const hitBox = new THREE.Mesh(hitBoxGeo, hitBoxMat);
+        hitBox.position.set(0, 0, 0);
+        hitBox.userData = { openingId: op.id, wall: op.wall, isDragHandle: true };
+        opGroup.add(hitBox);
+        draggableObjects.push(hitBox);
+
+        // Position opening on designated wall
+        const posY = getOpeningYPosition(op);
+        if (op.wall === 'front') {
+          opGroup.position.set(op.x, posY, d/2 - wallThick/2);
+        } else if (op.wall === 'back') {
+          opGroup.rotation.y = Math.PI;
+          opGroup.position.set(-op.x, posY, -d/2 + wallThick/2);
+        } else if (op.wall === 'left') {
+          opGroup.rotation.y = -Math.PI / 2;
+          opGroup.position.set(-w/2 + wallThick/2, posY, op.x);
+        } else if (op.wall === 'right') {
+          opGroup.rotation.y = Math.PI / 2;
+          opGroup.position.set(w/2 - wallThick/2, posY, -op.x);
+        }
+
+        roomGroup.add(opGroup);
+      });
+
+      // Side & Vertical Dimension Lines for Openings
+      if (config.showDimensions) {
+        buildOpeningSideDimensions();
+      }
+
+      // Roof Structure
+      const overhang = config.overhang;
+      const roofThick = 0.22;
+      const roofGeo = new THREE.BoxGeometry(w + overhang * 2, roofThick, d + overhang * 1.5);
+      const roofMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.3 });
+      const roof = new THREE.Mesh(roofGeo, roofMat);
+      roof.position.set(0, h + 0.2 + roofThick / 2, overhang * 0.2);
+      roof.castShadow = true;
+      roof.receiveShadow = true;
+      roomGroup.add(roof);
+
+      // Front Decking Platform
+      if (config.hasDecking) {
+        const deckW = w + 0.2;
+        const deckD = 1.2;
+        const deckGeo = new THREE.BoxGeometry(deckW, 0.08, deckD);
+        const deckMat = new THREE.MeshStandardMaterial({ map: textures.cedar, roughness: 0.7 });
+        const deck = new THREE.Mesh(deckGeo, deckMat);
+        deck.position.set(0, 0.04, d/2 + deckD/2 + 0.02);
+        deck.receiveShadow = true;
+        roomGroup.add(deck);
+      }
+
+      calculatePrice();
+      updateOverlayUI();
+    }
+
+    function buildInteriorFurniture(w, d, h) {
+      const deskGroup = new THREE.Group();
+      const deskMat = new THREE.MeshStandardMaterial({ color: 0x27272a, roughness: 0.5 });
+      const topGeo = new THREE.BoxGeometry(1.4, 0.04, 0.7);
+      const topMesh = new THREE.Mesh(topGeo, deskMat);
+      topMesh.position.y = 0.74;
+      deskGroup.add(topMesh);
+
+      const legGeo = new THREE.BoxGeometry(0.04, 0.74, 0.04);
+      [[-0.65, -0.3], [0.65, -0.3], [-0.65, 0.3], [0.65, 0.3]].forEach(pos => {
+        const leg = new THREE.Mesh(legGeo, deskMat);
+        leg.position.set(pos[0], 0.37, pos[1]);
+        deskGroup.add(leg);
+      });
+
+      const lapMat = new THREE.MeshStandardMaterial({ color: 0xd4d4d8, metalness: 0.8, roughness: 0.2 });
+      const laptop = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.015, 0.24), lapMat);
+      laptop.position.set(0, 0.76, 0);
+      deskGroup.add(laptop);
+
+      deskGroup.position.set(0, 0.2, -d / 2 + 0.6);
+      roomGroup.add(deskGroup);
+    }
+
+    function buildOpeningSideDimensions() {
+      dimensionAnchors = [];
+      const lineMat = new THREE.LineBasicMaterial({ color: 0x10b981, linewidth: 2 });
+      const tickMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
+      const tickGeo = new THREE.BoxGeometry(0.04, 0.12, 0.04);
+
+      config.openings.forEach(op => {
+        const wallMax = (op.wall === 'front' || op.wall === 'back') ? config.width : config.depth;
+        const opW = getOpeningWidth(op.type);
+        const opH = getOpeningHeight(op.type);
+        const posY = getOpeningYPosition(op);
+
+        const leftDist = (wallMax / 2) + op.x - (opW / 2);
+        const rightDist = (wallMax / 2) - op.x - (opW / 2);
+
+        const dimY = posY + (opH / 2) + 0.15;
+        const offsetDist = (op.wall === 'front' || op.wall === 'right') ? 0.12 : -0.12;
+
+        let startPoint = new THREE.Vector3();
+        let leftEdgePoint = new THREE.Vector3();
+        let rightEdgePoint = new THREE.Vector3();
+        let endPoint = new THREE.Vector3();
+
+        if (op.wall === 'front') {
+          const z = config.depth / 2 + offsetDist;
+          startPoint.set(-wallMax / 2, dimY, z);
+          leftEdgePoint.set(op.x - opW / 2, dimY, z);
+          rightEdgePoint.set(op.x + opW / 2, dimY, z);
+          endPoint.set(wallMax / 2, dimY, z);
+        } else if (op.wall === 'back') {
+          const z = -config.depth / 2 - offsetDist;
+          startPoint.set(wallMax / 2, dimY, z);
+          leftEdgePoint.set(-op.x + opW / 2, dimY, z);
+          rightEdgePoint.set(-op.x - opW / 2, dimY, z);
+          endPoint.set(-wallMax / 2, dimY, z);
+        } else if (op.wall === 'left') {
+          const x = -config.width / 2 - offsetDist;
+          startPoint.set(x, dimY, -wallMax / 2);
+          leftEdgePoint.set(x, dimY, op.x - opW / 2);
+          rightEdgePoint.set(x, dimY, op.x + opW / 2);
+          endPoint.set(x, dimY, wallMax / 2);
+        } else if (op.wall === 'right') {
+          const x = config.width / 2 + offsetDist;
+          startPoint.set(x, dimY, wallMax / 2);
+          leftEdgePoint.set(x, dimY, -op.x - opW / 2);
+          rightEdgePoint.set(x, dimY, -op.x + opW / 2);
+          endPoint.set(x, dimY, -wallMax / 2);
+        }
+
+        const lineLeftGeo = new THREE.BufferGeometry().setFromPoints([startPoint, leftEdgePoint]);
+        const lineRightGeo = new THREE.BufferGeometry().setFromPoints([rightEdgePoint, endPoint]);
+        roomGroup.add(new THREE.Line(lineLeftGeo, lineMat));
+        roomGroup.add(new THREE.Line(lineRightGeo, lineMat));
+
+        [startPoint, leftEdgePoint, rightEdgePoint, endPoint].forEach(pt => {
+          const tick = new THREE.Mesh(tickGeo, tickMat);
+          tick.position.copy(pt);
+          roomGroup.add(tick);
+        });
+
+        const leftMid = new THREE.Vector3().addVectors(startPoint, leftEdgePoint).multiplyScalar(0.5);
+        const rightMid = new THREE.Vector3().addVectors(rightEdgePoint, endPoint).multiplyScalar(0.5);
+        const centerMid = new THREE.Vector3().addVectors(leftEdgePoint, rightEdgePoint).multiplyScalar(0.5);
+
+        dimensionAnchors.push(
+          { opId: op.id, side: 'left', dist: leftDist, pos3D: leftMid, wallMax, opW },
+          { opId: op.id, side: 'width', dist: opW, pos3D: centerMid, wallMax, opW },
+          { opId: op.id, side: 'right', dist: rightDist, pos3D: rightMid, wallMax, opW }
+        );
+
+        // Vertical Cill Height Dimension Line for Windows
+        if (op.type.startsWith('window')) {
+          const cillH = (posY - opH / 2) - 0.20;
+          let vStart = new THREE.Vector3();
+          let vEnd = new THREE.Vector3();
+
+          if (op.wall === 'front') {
+            const z = config.depth / 2 + offsetDist;
+            vStart.set(op.x, 0.20, z);
+            vEnd.set(op.x, posY - opH / 2, z);
+          } else if (op.wall === 'back') {
+            const z = -config.depth / 2 - offsetDist;
+            vStart.set(-op.x, 0.20, z);
+            vEnd.set(-op.x, posY - opH / 2, z);
+          } else if (op.wall === 'left') {
+            const x = -config.width / 2 - offsetDist;
+            vStart.set(x, 0.20, op.x);
+            vEnd.set(x, posY - opH / 2, op.x);
+          } else if (op.wall === 'right') {
+            const x = config.width / 2 + offsetDist;
+            vStart.set(x, 0.20, -op.x);
+            vEnd.set(x, posY - opH / 2, -op.x);
+          }
+
+          const vLineGeo = new THREE.BufferGeometry().setFromPoints([vStart, vEnd]);
+          roomGroup.add(new THREE.Line(vLineGeo, lineMat));
+
+          const cillMid = new THREE.Vector3().addVectors(vStart, vEnd).multiplyScalar(0.5);
+          dimensionAnchors.push(
+            { opId: op.id, side: 'cill', dist: cillH, pos3D: cillMid, wallMax, opW }
+          );
+        }
+      });
+    }
+
+    function toScreenPos(pos3D) {
+      const v = pos3D.clone();
+      v.project(camera);
+      const width = container.clientWidth || window.innerWidth;
+      const height = container.clientHeight || window.innerHeight;
+      return {
+        x: (v.x * 0.5 + 0.5) * width,
+        y: (-v.y * 0.5 + 0.5) * height,
+        inView: (v.z < 1)
+      };
+    }
+
+    let overlayStateKey = '';
+
+    function rebuildOverlayDOM() {
+      const overlay = document.getElementById('opening-overlay-container');
+      if (!overlay || isEditingDimension) return;
+
+      const currentStateKey = `${selectedOpeningId}_${isMoveModeActive}_${config.openings.map(o => o.id + o.x.toFixed(2) + (o.y ? o.y.toFixed(2) : '') + o.wall + o.type).join(',')}`;
+      if (overlayStateKey === currentStateKey) return;
+      overlayStateKey = currentStateKey;
+
+      overlay.innerHTML = '';
+
+      if (selectedOpeningId) {
+        const op = config.openings.find(o => o.id === selectedOpeningId);
+        if (op) {
+          const popupEl = document.createElement('div');
+          popupEl.id = 'selected-opening-popup-el';
+          popupEl.className = 'absolute transform -translate-x-1/2 -translate-y-full bg-zinc-900/95 border border-emerald-500/50 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl pointer-events-auto flex items-center gap-2 z-30 transition-none';
+          
+          const opTitle = getOpeningTitle(op.type).toUpperCase();
+
+          if (isMoveModeActive) {
+            popupEl.innerHTML = `
+              <div class="flex items-center gap-2">
+                <div class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 text-amber-300 text-xs font-bold animate-pulse flex items-center gap-1.5 border border-amber-500/40">
+                  <i class="fa-solid fa-up-down-left-right"></i>
+                  <span>${op.type.startsWith('window') ? 'Drag window ↔ ↕ in 3D...' : 'Drag door ↔ in 3D...'}</span>
+                </div>
+                <button onclick="disableMoveMode()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs rounded-xl transition shadow cursor-pointer">
+                  <i class="fa-solid fa-check mr-1"></i> Done
+                </button>
+              </div>
+            `;
+          } else {
+            popupEl.innerHTML = `
+              <div class="text-[11px] font-bold text-emerald-400 uppercase px-2 tracking-wider border-r border-zinc-700 pr-3 hidden sm:block">
+                ${opTitle}
+              </div>
+              <button onclick="enableMoveMode()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow cursor-pointer">
+                <i class="fa-solid fa-up-down-left-right"></i>
+                <span>Move / Drag</span>
+              </button>
+              <button onclick="removeOpening('${op.id}')" class="px-2.5 py-1.5 bg-zinc-800 hover:bg-rose-500/20 text-rose-400 border border-zinc-700 hover:border-rose-500/40 font-semibold text-xs rounded-xl transition cursor-pointer">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+              <button onclick="deselectOpening()" class="px-2 py-1.5 text-zinc-400 hover:text-zinc-200 text-xs cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            `;
+          }
+          overlay.appendChild(popupEl);
+        }
+      }
+
+      dimensionAnchors.forEach((anchor, idx) => {
+        if (selectedOpeningId && anchor.opId !== selectedOpeningId) return;
+
+        const badge = document.createElement('div');
+        badge.id = `dim-badge-${idx}`;
+        badge.className = 'absolute transform -translate-x-1/2 -translate-y-1/2 pointer-events-auto z-20';
+
+        if (anchor.side === 'width') {
+          badge.innerHTML = `
+            <span class="px-2 py-0.5 bg-zinc-900/90 border border-zinc-700 text-zinc-300 text-[11px] font-medium rounded-md shadow-sm">
+              <i class="fa-solid fa-arrows-left-right text-[9px] mr-1 text-emerald-400"></i>${anchor.dist.toFixed(2)}m
+            </span>
+          `;
+        } else if (anchor.side === 'cill') {
+          badge.innerHTML = `
+            <div class="group relative flex items-center">
+              <button onclick="makeDimensionEditable(this, '${anchor.opId}', '${anchor.side}', ${anchor.wallMax}, ${anchor.opW})" 
+                class="px-2 py-0.5 bg-amber-950/90 border border-amber-500/60 text-amber-300 hover:bg-amber-500 hover:text-zinc-950 text-xs font-bold rounded-lg shadow-lg transition flex items-center gap-1 cursor-pointer">
+                <i class="fa-solid fa-arrows-up-down text-[9px] opacity-80"></i>
+                <span>Cill: ${anchor.dist.toFixed(2)}m</span>
+                <i class="fa-solid fa-pen text-[9px] opacity-70 group-hover:opacity-100"></i>
+              </button>
+            </div>
+          `;
+        } else {
+          badge.innerHTML = `
+            <div class="group relative flex items-center">
+              <button onclick="makeDimensionEditable(this, '${anchor.opId}', '${anchor.side}', ${anchor.wallMax}, ${anchor.opW})" 
+                class="px-2 py-0.5 bg-emerald-950/90 border border-emerald-500/60 text-emerald-300 hover:bg-emerald-500 hover:text-zinc-950 text-xs font-bold rounded-lg shadow-lg transition flex items-center gap-1 cursor-pointer">
+                <span>${anchor.dist.toFixed(2)}m</span>
+                <i class="fa-solid fa-pen text-[9px] opacity-70 group-hover:opacity-100"></i>
+              </button>
+            </div>
+          `;
+        }
+
+        overlay.appendChild(badge);
+      });
+    }
+
+    function updateOverlayUI() {
+      rebuildOverlayDOM();
+
+      if (isEditingDimension) return;
+
+      if (selectedOpeningId) {
+        const popupEl = document.getElementById('selected-opening-popup-el');
+        const op = config.openings.find(o => o.id === selectedOpeningId);
+        if (popupEl && op) {
+          const posY = getOpeningYPosition(op);
+
+          let popup3D = new THREE.Vector3();
+          if (op.wall === 'front') popup3D.set(op.x, posY + getOpeningHeight(op.type)/2 + 0.25, config.depth / 2);
+          else if (op.wall === 'back') popup3D.set(-op.x, posY + getOpeningHeight(op.type)/2 + 0.25, -config.depth / 2);
+          else if (op.wall === 'left') popup3D.set(-config.width / 2, posY + getOpeningHeight(op.type)/2 + 0.25, op.x);
+          else if (op.wall === 'right') popup3D.set(config.width / 2, posY + getOpeningHeight(op.type)/2 + 0.25, -op.x);
+
+          const screen = toScreenPos(popup3D);
+          if (screen.inView) {
+            popupEl.style.display = 'flex';
+            popupEl.style.left = `${screen.x}px`;
+            popupEl.style.top = `${screen.y - 10}px`;
+          } else {
+            popupEl.style.display = 'none';
+          }
+        }
+      }
+
+      dimensionAnchors.forEach((anchor, idx) => {
+        if (selectedOpeningId && anchor.opId !== selectedOpeningId) return;
+        const badge = document.getElementById(`dim-badge-${idx}`);
+        if (badge) {
+          const screen = toScreenPos(anchor.pos3D);
+          if (screen.inView) {
+            badge.style.display = 'block';
+            badge.style.left = `${screen.x}px`;
+            badge.style.top = `${screen.y}px`;
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    function makeDimensionEditable(btnEl, opId, side, wallMax, opW) {
+      isEditingDimension = true;
+      const op = config.openings.find(o => o.id === opId);
+      if (!op) return;
+
+      let currentDist = 0;
+      if (side === 'left') {
+        currentDist = (wallMax / 2) + op.x - (opW / 2);
+      } else if (side === 'right') {
+        currentDist = (wallMax / 2) - op.x - (opW / 2);
+      } else if (side === 'cill') {
+        const posY = getOpeningYPosition(op);
+        currentDist = (posY - getOpeningHeight(op.type) / 2) - 0.20;
+      }
+
+      const parent = btnEl.parentElement;
+      parent.innerHTML = `
+        <div class="flex items-center bg-zinc-900 border-2 border-emerald-500 rounded-lg shadow-xl p-0.5">
+          <input type="number" step="0.05" min="0.1" max="3.0" value="${currentDist.toFixed(2)}"
+            id="dim-input-active"
+            class="w-16 bg-zinc-800 text-white font-bold text-xs p-1 rounded outline-none text-center"
+            onkeydown="if(event.key==='Enter') applyDimensionChange('${opId}', '${side}', this.value, ${wallMax}, ${opW})"
+            onblur="applyDimensionChange('${opId}', '${side}', this.value, ${wallMax}, ${opW})">
+          <span class="text-[10px] text-zinc-400 px-1">m</span>
+        </div>
+      `;
+
+      const input = document.getElementById('dim-input-active');
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }
+
+    function applyDimensionChange(opId, side, newDistVal, wallMax, opW) {
+      isEditingDimension = false;
+      overlayStateKey = '';
+      const dist = parseFloat(newDistVal);
+      if (isNaN(dist)) {
+        build3DRoom();
+        return;
+      }
+
+      const op = config.openings.find(o => o.id === opId);
+      if (op) {
+        const minX = -(wallMax / 2) + (opW / 2) + 0.1;
+        const maxX = (wallMax / 2) - (opW / 2) - 0.1;
+
+        if (side === 'left') {
+          const targetX = dist + (opW / 2) - (wallMax / 2);
+          op.x = Math.max(minX, Math.min(maxX, targetX));
+        } else if (side === 'right') {
+          const targetX = (wallMax / 2) - dist - (opW / 2);
+          op.x = Math.max(minX, Math.min(maxX, targetX));
+        } else if (side === 'cill') {
+          const opH = getOpeningHeight(op.type);
+          const targetPosY = 0.20 + dist + (opH / 2);
+          const minY = 0.20 + (opH / 2) + 0.05;
+          const maxY = (config.height + 0.20) - (opH / 2) - 0.05;
+          op.y = Math.max(minY, Math.min(maxY, targetPosY));
+        }
+
+        renderPlacedOpeningsList();
+        build3DRoom();
+      }
+    }
+
+    function enableMoveMode() {
+      isMoveModeActive = true;
+      canvas.style.cursor = 'grab';
+      overlayStateKey = '';
+      updateOverlayUI();
+    }
+
+    function disableMoveMode() {
+      isMoveModeActive = false;
+      canvas.style.cursor = 'default';
+      overlayStateKey = '';
+      updateOverlayUI();
+    }
+
+    function deselectOpening() {
+      selectedOpeningId = null;
+      isMoveModeActive = false;
+      overlayStateKey = '';
+      build3DRoom();
+    }
+
+    function setTargetWall(wall) {
+      config.targetWall = wall;
+      document.querySelectorAll('.wall-select-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.classList.add('text-zinc-400');
+      });
+      const activeBtn = document.getElementById(`wall-btn-${wall}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.classList.remove('text-zinc-400');
+      }
+
+      // Rotate camera to face selected target wall
+      const w = config.width;
+      const d = config.depth;
+      if (wall === 'front') {
+        camera.position.set(0, 1.8, d * 2.2);
+        controls.target.set(0, 1.3, 0);
+      } else if (wall === 'back') {
+        camera.position.set(0, 1.8, -d * 2.2);
+        controls.target.set(0, 1.3, 0);
+      } else if (wall === 'left') {
+        camera.position.set(-w * 2.2, 1.8, 0);
+        controls.target.set(0, 1.3, 0);
+      } else if (wall === 'right') {
+        camera.position.set(w * 2.2, 1.8, 0);
+        controls.target.set(0, 1.3, 0);
+      }
+      controls.update();
+    }
+
+    function changeOpeningWall(opId, newWall) {
+      const op = config.openings.find(o => o.id === opId);
+      if (op) {
+        op.wall = newWall;
+        op.x = 0; // Center on new wall
+        overlayStateKey = '';
+        renderPlacedOpeningsList();
+        build3DRoom();
+      }
+    }
+
+    function switchTab(tabName) {
+      const tabs = ['dimensions', 'materials', 'openings', 'decking'];
+      tabs.forEach(t => {
+        const tabBtn = document.getElementById(`tab-${t}`);
+        const tabContent = document.getElementById(`content-${t}`);
+        if (t === tabName) {
+          if (tabBtn) {
+            tabBtn.classList.add('text-emerald-400', 'border-b-2', 'border-emerald-500', 'bg-zinc-800/40');
+            tabBtn.classList.remove('hover:text-zinc-200');
+          }
+          if (tabContent) tabContent.classList.remove('hidden');
+        } else {
+          if (tabBtn) {
+            tabBtn.classList.remove('text-emerald-400', 'border-b-2', 'border-emerald-500', 'bg-zinc-800/40');
+            tabBtn.classList.add('hover:text-zinc-200');
+          }
+          if (tabContent) tabContent.classList.add('hidden');
+        }
+      });
+    }
+
+    function filterGlazingCategory(cat) {
+      document.querySelectorAll('.glazing-filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.classList.add('text-zinc-400');
+      });
+      const activeBtn = document.getElementById(`glazing-cat-${cat}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.classList.remove('text-zinc-400');
+      }
+
+      document.querySelectorAll('.glazing-option-card').forEach(card => {
+        if (card.getAttribute('data-cat') === cat) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function setRoofType(type) {
+      config.roofType = type;
+      document.querySelectorAll('.roof-btn').forEach(btn => {
+        btn.classList.remove('border-emerald-500', 'bg-emerald-500/10');
+        btn.classList.add('border-zinc-800', 'bg-zinc-800/40');
+      });
+      const activeBtn = document.getElementById(`roof-${type}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-zinc-800', 'bg-zinc-800/40');
+        activeBtn.classList.add('border-emerald-500', 'bg-emerald-500/10');
+      }
+      build3DRoom();
+    }
+
+    function setCladding(type) {
+      config.cladding = type;
+      document.querySelectorAll('.clad-btn').forEach(btn => {
+        btn.classList.remove('border-emerald-500', 'bg-emerald-500/10', 'active');
+        btn.classList.add('border-zinc-800', 'bg-zinc-800/40');
+      });
+      const activeBtn = document.getElementById(`clad-${type}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-zinc-800', 'bg-zinc-800/40');
+        activeBtn.classList.add('border-emerald-500', 'bg-emerald-500/10', 'active');
+      }
+      build3DRoom();
+    }
+
+    function setFrameColor(color) {
+      config.frameColor = color;
+      build3DRoom();
+    }
+
+    function addOpening(type) {
+      const newId = Date.now().toString();
+      const defaultY = getOpeningYPosition({ type: type });
+      config.openings.push({ 
+        id: newId, 
+        type: type, 
+        wall: config.targetWall || 'front', 
+        x: 0, 
+        y: defaultY 
+      });
+      selectedOpeningId = newId;
+      overlayStateKey = '';
+      renderPlacedOpeningsList();
+      build3DRoom();
+    }
+
+    function removeOpening(id) {
+      config.openings = config.openings.filter(o => o.id !== id);
+      if (selectedOpeningId === id) selectedOpeningId = null;
+      overlayStateKey = '';
+      renderPlacedOpeningsList();
+      build3DRoom();
+    }
+
+    function renderPlacedOpeningsList() {
+      const container = document.getElementById('placed-openings-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (config.openings.length === 0) {
+        container.innerHTML = `<div class="text-xs text-zinc-500 italic">No openings added yet.</div>`;
+        return;
+      }
+
+      config.openings.forEach((op) => {
+        const item = document.createElement('div');
+        item.className = `p-3 rounded-xl border ${selectedOpeningId === op.id ? 'border-emerald-500 bg-emerald-500/10' : 'border-zinc-800 bg-zinc-800/40'} flex flex-col gap-2 transition`;
+        
+        const posY = getOpeningYPosition(op);
+        const cillH = (posY - getOpeningHeight(op.type)/2) - 0.20;
+        const detailStr = op.type.startsWith('window') 
+          ? `Offset: ${op.x.toFixed(2)}m | Cill: ${cillH.toFixed(2)}m`
+          : `Offset: ${op.x.toFixed(2)}m`;
+
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold text-emerald-400 uppercase">${getOpeningTitle(op.type)}</span>
+              <span class="text-[10px] text-zinc-400 bg-zinc-900 border border-zinc-700 px-1.5 py-0.5 rounded font-mono uppercase">${op.wall}</span>
+            </div>
+            <div class="flex items-center space-x-1">
+              <button onclick="selectedOpeningId='${op.id}'; enableMoveMode(); build3DRoom();" class="text-xs px-2 py-1 bg-emerald-500/20 hover:bg-emerald-500 text-emerald-400 hover:text-zinc-950 font-bold rounded-lg transition cursor-pointer">
+                Move
+              </button>
+              <button onclick="removeOpening('${op.id}')" class="text-xs px-2 py-1 bg-zinc-800 hover:bg-rose-500/20 text-rose-400 rounded-lg transition cursor-pointer">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-zinc-400">
+            <span>${detailStr}</span>
+            <div class="flex gap-1">
+              <button onclick="changeOpeningWall('${op.id}', 'front')" class="px-1.5 py-0.5 rounded ${op.wall==='front'?'bg-emerald-500 text-zinc-950 font-bold':'bg-zinc-800 hover:text-white'}">F</button>
+              <button onclick="changeOpeningWall('${op.id}', 'left')" class="px-1.5 py-0.5 rounded ${op.wall==='left'?'bg-emerald-500 text-zinc-950 font-bold':'bg-zinc-800 hover:text-white'}">L</button>
+              <button onclick="changeOpeningWall('${op.id}', 'right')" class="px-1.5 py-0.5 rounded ${op.wall==='right'?'bg-emerald-500 text-zinc-950 font-bold':'bg-zinc-800 hover:text-white'}">R</button>
+              <button onclick="changeOpeningWall('${op.id}', 'back')" class="px-1.5 py-0.5 rounded ${op.wall==='back'?'bg-emerald-500 text-zinc-950 font-bold':'bg-zinc-800 hover:text-white'}">B</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function toggleDecking() {
+      const el = document.getElementById('check-decking');
+      if (el) config.hasDecking = el.checked;
+      build3DRoom();
+    }
+
+    function toggleFurniture() {
+      const el = document.getElementById('check-interior-furniture');
+      if (el) config.showFurniture = el.checked;
+      build3DRoom();
+    }
+
+    function toggleDimensionsOverlay() {
+      const el = document.getElementById('check-dimensions');
+      if (el) config.showDimensions = el.checked;
+      build3DRoom();
+    }
+
+    function calculatePrice() {
+      const area = config.width * config.depth;
+      let basePrice = area * 680;
+
+      if (config.cladding === 'oak') basePrice += area * 12;
+      if (config.cladding === 'composite') basePrice += area * 35;
+      if (config.cladding === 'render') basePrice += area * 25;
+
+      config.openings.forEach(op => {
+        if (op.type === 'bifold-180') basePrice += 1850;
+        else if (op.type === 'bifold-240') basePrice += 2100;
+        else if (op.type === 'bifold-wide') basePrice += 2450;
+        else if (op.type === 'bifold-360') basePrice += 3100;
+        else if (op.type.startsWith('sliding')) basePrice += 1750;
+        else if (op.type.startsWith('french')) basePrice += 1350;
+        else if (op.type.startsWith('single')) basePrice += 780;
+        else if (op.type.startsWith('window-high')) basePrice += 520;
+        else if (op.type.startsWith('window-casement')) basePrice += 450;
+        else if (op.type.startsWith('window-tall')) basePrice += 550;
+      });
+
+      if (config.hasDecking) basePrice += 850;
+      const heatingEl = document.getElementById('check-heating');
+      if (heatingEl && heatingEl.checked) basePrice += area * 45;
+
+      const rounded = Math.round(basePrice);
+      const perSqm = Math.round(rounded / area);
+
+      const totalEl = document.getElementById('price-total');
+      const sqmEl = document.getElementById('price-sqm');
+      const areaBadge = document.getElementById('badge-area');
+      const footBadge = document.getElementById('badge-footprint');
+
+      if (totalEl) totalEl.innerText = `£${rounded.toLocaleString('en-GB')}`;
+      if (sqmEl) sqmEl.innerText = `£${perSqm} / m²`;
+      if (areaBadge) areaBadge.innerText = `${area.toFixed(2)} m²`;
+      if (footBadge) footBadge.innerText = `${config.width.toFixed(2)}m × ${config.depth.toFixed(2)}m`;
+    }
+
+    function setCameraView(view) {
+      document.querySelectorAll('.cam-btn').forEach(btn => {
+        btn.classList.remove('bg-emerald-500', 'text-white');
+        btn.classList.add('text-slate-600');
+      });
+      event.currentTarget.classList.add('bg-emerald-500', 'text-white');
+      event.currentTarget.classList.remove('text-slate-600');
+
+      const w = config.width;
+      const d = config.depth;
+
+      if (view === '3d') {
+        camera.position.set(8.5, 4.2, 9.5);
+        controls.target.set(0, 1.3, 0);
+      } else if (view === 'top') {
+        camera.position.set(0, 12, 0.001);
+        controls.target.set(0, 0, 0);
+      } else if (view === 'front') {
+        camera.position.set(0, 1.8, d * 2.2);
+        controls.target.set(0, 1.3, 0);
+      } else if (view === 'interior') {
+        camera.position.set(0, 1.5, d / 2 - 0.4);
+        controls.target.set(0, 1.3, -d / 2 + 0.5);
+      }
+      controls.update();
+    }
+
+    function resetConfiguration() {
+      config.width = 4.5;
+      config.depth = 3.5;
+      config.height = 2.74;
+      config.overhang = 0.40;
+      config.cladding = 'cedar';
+      config.openings = [
+        { id: '1', type: 'bifold-240', wall: 'front', x: 0 },
+        { id: '2', type: 'window-high-120', wall: 'right', x: 0.8, y: 1.95 }
+      ];
+
+      document.getElementById('input-width').value = 4.5;
+      document.getElementById('input-depth').value = 3.5;
+      document.getElementById('input-height').value = 2.74;
+      document.getElementById('input-overhang').value = 0.4;
+      document.getElementById('val-width').innerText = '4.50 m';
+      document.getElementById('val-depth').innerText = '3.50 m';
+      document.getElementById('val-height').innerText = '2.74 m';
+      document.getElementById('val-overhang').innerText = '0.40 m';
+
+      setCladding('cedar');
+      renderPlacedOpeningsList();
+      build3DRoom();
+    }
+
+    function openQuoteModal() {
+      const modal = document.getElementById('quote-modal');
+      const sizeEl = document.getElementById('modal-size');
+      const cladEl = document.getElementById('modal-clad');
+      const priceEl = document.getElementById('modal-price');
+
+      if (sizeEl) sizeEl.innerText = `${config.width}m x ${config.depth}m (${(config.width*config.depth).toFixed(1)}m²)`;
+      if (cladEl) cladEl.innerText = config.cladding.toUpperCase();
+      if (priceEl) priceEl.innerText = document.getElementById('price-total').innerText;
+
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeQuoteModal() {
+      const modal = document.getElementById('quote-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function submitQuote() {
+      const modal = document.getElementById('quote-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+      const pos = getPointerPos(e);
+      mouse.x = pos.x;
+      mouse.y = pos.y;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(draggableObjects, true);
+
+      if (intersects.length > 0) {
+        const hitObj = intersects[0].object;
+        if (hitObj.userData && hitObj.userData.openingId) {
+          selectedOpeningId = hitObj.userData.openingId;
+          const op = config.openings.find(o => o.id === selectedOpeningId);
+
+          if (isMoveModeActive && op) {
+            isDraggingOpening = true;
+            draggedOpeningId = selectedOpeningId;
+            controls.enabled = false;
+
+            // Define wall dragging plane
+            if (op.wall === 'front') {
+              dragWallPlane.setComponents(0, 0, 1, -config.depth / 2);
+            } else if (op.wall === 'back') {
+              dragWallPlane.setComponents(0, 0, -1, -config.depth / 2);
+            } else if (op.wall === 'left') {
+              dragWallPlane.setComponents(-1, 0, 0, -config.width / 2);
+            } else if (op.wall === 'right') {
+              dragWallPlane.setComponents(1, 0, 0, -config.width / 2);
+            }
+          }
+
+          overlayStateKey = '';
+          build3DRoom();
+        }
+      }
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (isDraggingOpening && draggedOpeningId) {
+        const pos = getPointerPos(e);
+        mouse.x = pos.x;
+        mouse.y = pos.y;
+
+        raycaster.setFromCamera(mouse, camera);
+        if (raycaster.ray.intersectPlane(dragWallPlane, dragPlaneIntersect)) {
+          const op = config.openings.find(o => o.id === draggedOpeningId);
+          if (op) {
+            const wallMax = (op.wall === 'front' || op.wall === 'back') ? config.width : config.depth;
+            const opW = getOpeningWidth(op.type);
+            const opH = getOpeningHeight(op.type);
+
+            const minX = -(wallMax / 2) + (opW / 2) + 0.1;
+            const maxX = (wallMax / 2) - (opW / 2) - 0.1;
+
+            if (op.wall === 'front') op.x = Math.max(minX, Math.min(maxX, dragPlaneIntersect.x));
+            else if (op.wall === 'back') op.x = Math.max(minX, Math.min(maxX, -dragPlaneIntersect.x));
+            else if (op.wall === 'left') op.x = Math.max(minX, Math.min(maxX, dragPlaneIntersect.z));
+            else if (op.wall === 'right') op.x = Math.max(minX, Math.min(maxX, -dragPlaneIntersect.z));
+
+            // Vertical Dragging logic for windows
+            if (op.type.startsWith('window')) {
+              const minY = 0.20 + (opH / 2) + 0.05;
+              const maxY = (config.height + 0.20) - (opH / 2) - 0.05;
+              op.y = Math.max(minY, Math.min(maxY, dragPlaneIntersect.y));
+            }
+
+            renderPlacedOpeningsList();
+            build3DRoom();
+          }
+        }
+      }
+    });
+
+    window.addEventListener('pointerup', () => {
+      if (isDraggingOpening) {
+        isDraggingOpening = false;
+        draggedOpeningId = null;
+        controls.enabled = true;
+      }
+    });
+
+    document.getElementById('input-width').addEventListener('input', (e) => {
+      config.width = parseFloat(e.target.value);
+      document.getElementById('val-width').innerText = `${config.width.toFixed(2)} m`;
+      build3DRoom();
+    });
+
+    document.getElementById('input-depth').addEventListener('input', (e) => {
+      config.depth = parseFloat(e.target.value);
+      document.getElementById('val-depth').innerText = `${config.depth.toFixed(2)} m`;
+      build3DRoom();
+    });
+
+    document.getElementById('input-height').addEventListener('input', (e) => {
+      config.height = parseFloat(e.target.value);
+      document.getElementById('val-height').innerText = `${config.height.toFixed(2)} m`;
+      build3DRoom();
+    });
+
+    document.getElementById('input-overhang').addEventListener('input', (e) => {
+      config.overhang = parseFloat(e.target.value);
+      document.getElementById('val-overhang').innerText = `${config.overhang.toFixed(2)} m`;
+      build3DRoom();
+    });
+
+    document.getElementById('sun-slider').addEventListener('input', (e) => {
+      const angle = parseFloat(e.target.value);
+      sunLight.position.x = Math.cos(angle) * 20;
+      sunLight.position.z = Math.sin(angle) * 20;
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      updateOverlayUI();
+      renderer.render(scene, camera);
+    }
+
+    window.onload = function() {
+      updateCanvasSize();
+      renderPlacedOpeningsList();
+      build3DRoom();
+      animate();
+    };
+  </script>
+</body>
+</html>

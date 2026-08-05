@@ -12,9 +12,18 @@ module.exports = async (req, res) => {
 
     const promptInput =
       (req.body?.prompt || "").trim() ||
-      "holding a glowing Solana coin on a rocket ship blasting to the moon, crypto trading charts in the background";
+      "celebrating a huge Solana pump, crazy gains vibe";
 
-    const userPrompt = `${CHARACTER_ANCHOR} Scene & Action: ${promptInput}. Include crypto/memecoin visual elements (Solana logo colors, coins, candlestick charts, "to the moon" energy, or a phone/laptop showing a green trading chart) worked naturally into the scene. High quality photo-real product shot, soft studio lighting, shallow depth of field, shot like a real plush toy lifestyle photo.`;
+    const userPrompt = `${CHARACTER_ANCHOR} Scene & Action: ${promptInput}.
+
+STYLE - "Solana degen desk" aesthetic, matching this exact formula:
+- Photo-real lifestyle product shot, MIRUMI sitting on a wooden desk or table, shallow depth of field, warm cozy ambient lighting (like a cluttered trading desk at home).
+- A phone or tablet propped up nearby showing a bold green Solana (SOL) candlestick chart pumping upward, with a big green percentage gain number on screen (e.g. "+420%").
+- Small physical props scattered around MIRUMI: real gold/silver Solana-branded coins stacked or scattered, a tiny toy rocket, a hand-written note or cardboard sign with a short degen phrase relevant to the scene (crypto slang like "TO THE MOON", "DIAMOND HANDS", "ATH", "WAGMI", "APED IN"), confetti or sparkle particles for hype.
+- Background softly blurred: bookshelf, plant, coffee mug - a real desk setup, not a studio void.
+- Overall mood: chaotic, hype, unmistakably "crypto degen won big today" energy, but still cute because MIRUMI is a soft round plush.
+
+Do not add any text overlays yourself beyond what's written on in-scene props/signs - the meme caption text is added separately afterward.`;
 
     // Try Imagen first
     const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${GEMINI_API_KEY}`;

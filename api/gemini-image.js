@@ -10,13 +10,15 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: "GEMINI_API_KEY not configured on server" });
     }
 
-    const promptInput =
-      (req.body?.prompt || "").trim() ||
-      "celebrating a huge Solana pump, crazy gains vibe";
+    const promptInput = (req.body?.prompt || "").trim();
 
-    const userPrompt = `${CHARACTER_ANCHOR} Scene & Action: ${promptInput}.
+    const sceneLine = promptInput
+      ? `Scene & Action: ${promptInput}.`
+      : `Scene & Action: invent something yourself - a completely unexpected, wildly creative moment of MIRUMI celebrating a huge Solana pump.`;
 
-STYLE - "Solana degen" vibe: photo-real lifestyle shot, warm cozy lighting, shallow depth of field. Weave in crypto/degen cues where they fit naturally - things like a chart pumping green, Solana coins, a handwritten degen sign (slang like "TO THE MOON", "WAGMI", "ATH", "DIAMOND HANDS"), confetti, a toy rocket. You choose which cues and how to compose the scene - keep it feeling like a real, slightly chaotic "crypto degen just won big" moment, cute because MIRUMI is a soft round plush.
+    const userPrompt = `${CHARACTER_ANCHOR} ${sceneLine}
+
+STYLE - "Solana degen" vibe: photo-real shot, natural lighting for whatever setting you choose, shallow depth of field. Invent a fresh, unexpected location and composition every single time - never default to a desk/office/trading setup unless it's specifically requested. Draw from any genre: outdoors, underwater, space, historical, futuristic, surreal/absurd, fantasy, nature, urban, anything - be genuinely imaginative and varied, not formulaic. Weave in crypto/degen cues where they fit naturally - things like a chart pumping green, Solana coins, a handwritten degen sign (slang like "TO THE MOON", "WAGMI", "ATH", "DIAMOND HANDS"), confetti, a toy rocket - but only where they make sense for the setting, don't force all of them in. Keep it feeling like a real, slightly chaotic "crypto degen just won big" moment, cute because MIRUMI is a soft round plush.
 
 Do not add any text overlays yourself beyond what's written on in-scene props/signs - the meme caption text is added separately afterward.`;
 
@@ -41,7 +43,7 @@ Do not add any text overlays yourself beyond what's written on in-scene props/si
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-          generationConfig: { responseModalities: ["IMAGE"] },
+          generationConfig: { responseModalities: ["IMAGE"], temperature: 1.4 },
         }),
       });
       data = await r.json();

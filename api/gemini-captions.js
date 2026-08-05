@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
         {
           parts: [
             {
-              text: 'Write 1 short viral meme top text and bottom text for $MIRUMI, Tokyo\'s viral plush robot charm on Solana. Return strictly JSON in form: {"topText": "...", "bottomText": "..."}',
+              text: 'Write 1 short viral crypto meme top text and bottom text for $MIRUMI, a fluffy plush toy character turned Solana memecoin. Use degen crypto meme culture and slang (e.g. "to the moon", "diamond hands", "buy the dip", "100x gem", "wagmi"). Return strictly JSON in form: {"topText": "...", "bottomText": "..."}',
             },
           ],
         },

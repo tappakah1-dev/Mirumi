@@ -16,12 +16,7 @@ module.exports = async (req, res) => {
 
     const userPrompt = `${CHARACTER_ANCHOR} Scene & Action: ${promptInput}.
 
-STYLE - "Solana degen desk" aesthetic, matching this exact formula:
-- Photo-real lifestyle product shot, MIRUMI sitting on a wooden desk or table, shallow depth of field, warm cozy ambient lighting (like a cluttered trading desk at home).
-- A phone or tablet propped up nearby showing a bold green Solana (SOL) candlestick chart pumping upward, with a big green percentage gain number on screen (e.g. "+420%").
-- Small physical props scattered around MIRUMI: real gold/silver Solana-branded coins stacked or scattered, a tiny toy rocket, a hand-written note or cardboard sign with a short degen phrase relevant to the scene (crypto slang like "TO THE MOON", "DIAMOND HANDS", "ATH", "WAGMI", "APED IN"), confetti or sparkle particles for hype.
-- Background softly blurred: bookshelf, plant, coffee mug - a real desk setup, not a studio void.
-- Overall mood: chaotic, hype, unmistakably "crypto degen won big today" energy, but still cute because MIRUMI is a soft round plush.
+STYLE - "Solana degen" vibe: photo-real lifestyle shot, warm cozy lighting, shallow depth of field. Weave in crypto/degen cues where they fit naturally - things like a chart pumping green, Solana coins, a handwritten degen sign (slang like "TO THE MOON", "WAGMI", "ATH", "DIAMOND HANDS"), confetti, a toy rocket. You choose which cues and how to compose the scene - keep it feeling like a real, slightly chaotic "crypto degen just won big" moment, cute because MIRUMI is a soft round plush.
 
 Do not add any text overlays yourself beyond what's written on in-scene props/signs - the meme caption text is added separately afterward.`;
 

@@ -721,13 +721,6 @@
                         <input type="text" id="meme-top-text" oninput="drawMemeCanvas()" value="LABUBU IS OUT" placeholder="Top Text..." class="w-full bg-white border border-pink-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-brand-pink shadow-sm">
                         <input type="text" id="meme-bot-text" oninput="drawMemeCanvas()" value="MIRUMI IS IN 🌸" placeholder="Bottom Text..." class="w-full bg-white border border-pink-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-brand-pink shadow-sm">
 
-                        <h3 class="font-bold text-slate-700 text-xs border-b border-pink-100 pb-1.5 pt-1 uppercase tracking-wider">Sticker Badge</h3>
-                        <div class="flex flex-wrap gap-1.5">
-                            <button onclick="setSticker('100x')" class="px-2.5 py-1 rounded-lg bg-pink-50 hover:bg-brand-pink hover:text-white text-[11px] border border-pink-200 text-slate-800 font-bold shadow-sm">🚀 100x Gem</button>
-                            <button onclick="setSticker('sol')" class="px-2.5 py-1 rounded-lg bg-pink-50 hover:bg-brand-pink hover:text-white text-[11px] border border-pink-200 text-slate-800 font-bold shadow-sm">⚡ Solana</button>
-                            <button onclick="setSticker('cute')" class="px-2.5 py-1 rounded-lg bg-pink-50 hover:bg-brand-pink hover:text-white text-[11px] border border-pink-200 text-slate-800 font-bold shadow-sm">💖 Cute Plush</button>
-                        </div>
-
                         <div class="pt-2">
                             <button onclick="downloadMeme()" class="w-full bg-gradient-to-r from-brand-pink to-brand-hotPink hover:from-brand-hotPink hover:to-rose-600 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm">
                                 <i class="fa-solid fa-download"></i>
@@ -1145,12 +1138,17 @@
         }
 
         // Canvas & Gemini AI Meme Generator Logic
-        let memeSticker = '100x';
         let aiLoadedImage = null;
 
-        function setSticker(sticker) {
-            memeSticker = sticker;
-            drawMemeCanvas();
+        // Shrinks font size until text fits within maxWidth, down to a minimum size
+        function fitFontSize(ctx, text, maxWidth, startSize, minSize, fontSpec) {
+            let size = startSize;
+            ctx.font = fontSpec(size);
+            while (ctx.measureText(text).width > maxWidth && size > minSize) {
+                size -= 1;
+                ctx.font = fontSpec(size);
+            }
+            return size;
         }
 
         function drawMemeCanvas() {
@@ -1184,36 +1182,36 @@
                 ctx.fillText("Generate your meme", canvas.width / 2, canvas.height / 2);
             }
 
-            // Draw Sticker
-            ctx.save();
-            ctx.font = "bold 16px 'Outfit', sans-serif";
-            ctx.textAlign = "right";
-            ctx.textBaseline = "top";
-            
-            let stickerText = "🚀 100x GEM";
-            if (memeSticker === 'sol') stickerText = "⚡ SOLANA SEASON";
-            else if (memeSticker === 'cute') stickerText = "💖 TOKYO CRAZE";
-
-            ctx.fillStyle = "#ff2a85";
-            ctx.fillRect(canvas.width - 180, 20, 160, 36);
-            ctx.fillStyle = "#ffffff";
-            ctx.fillText(stickerText, canvas.width - 30, 30);
-            ctx.restore();
+            const maxTextWidth = canvas.width - 40; // 20px padding each side
+            const fontSpec = (size) => `900 ${size}px 'Fredoka', 'Impact', sans-serif`;
 
             // Draw Top Text
             const topText = document.getElementById('meme-top-text').value.toUpperCase();
-            ctx.font = "900 36px 'Fredoka', 'Impact', sans-serif";
-            ctx.textAlign = "center";
-            ctx.fillStyle = "#FFFFFF";
-            ctx.strokeStyle = "#000000";
-            ctx.lineWidth = 6;
-            ctx.strokeText(topText, canvas.width / 2, 60);
-            ctx.fillText(topText, canvas.width / 2, 60);
+            if (topText) {
+                const topSize = fitFontSize(ctx, topText, maxTextWidth, 36, 16, fontSpec);
+                ctx.font = fontSpec(topSize);
+                ctx.textAlign = "center";
+                ctx.textBaseline = "alphabetic";
+                ctx.fillStyle = "#FFFFFF";
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 6;
+                ctx.strokeText(topText, canvas.width / 2, 60);
+                ctx.fillText(topText, canvas.width / 2, 60);
+            }
 
             // Draw Bottom Text
             const botText = document.getElementById('meme-bot-text').value.toUpperCase();
-            ctx.strokeText(botText, canvas.width / 2, canvas.height - 40);
-            ctx.fillText(botText, canvas.width / 2, canvas.height - 40);
+            if (botText) {
+                const botSize = fitFontSize(ctx, botText, maxTextWidth, 36, 16, fontSpec);
+                ctx.font = fontSpec(botSize);
+                ctx.textAlign = "center";
+                ctx.textBaseline = "alphabetic";
+                ctx.fillStyle = "#FFFFFF";
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 6;
+                ctx.strokeText(botText, canvas.width / 2, canvas.height - 40);
+                ctx.fillText(botText, canvas.width / 2, canvas.height - 40);
+            }
         }
 
         // Gemini AI Image Generator

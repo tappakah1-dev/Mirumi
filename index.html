@@ -160,8 +160,8 @@
         <div class="max-w-7xl mx-auto glass-panel rounded-full px-5 py-2.5 flex items-center justify-between shadow-lg">
             <!-- Brand Logo -->
             <a href="#" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-pink to-brand-hotPink flex items-center justify-center shadow-md group-hover:scale-110 transition-transform text-white">
-                    <span class="text-xl">🧸</span>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-pink to-brand-hotPink flex items-center justify-center shadow-md group-hover:scale-110 transition-transform text-white overflow-hidden">
+                    <img src="https://i.postimg.cc/NMBzcL3x/e18a8e15-392f-4925-a629-43fcd2be9fec.jpg" alt="Mirumi Logo" class="w-full h-full object-cover">
                 </div>
                 <div>
                     <span class="font-display text-2xl font-bold tracking-wider text-slate-900 group-hover:text-brand-hotPink transition-colors">$MIRUMI</span>
@@ -225,12 +225,12 @@
             <div class="relative max-w-4xl mx-auto mb-10 group">
                 <div class="absolute -inset-1 bg-gradient-to-r from-brand-pink via-brand-hotPink to-purple-400 rounded-3xl blur-md opacity-50 group-hover:opacity-80 transition duration-1000 group-hover:duration-200"></div>
                 <div class="relative glass-panel rounded-2xl p-2 sm:p-3 overflow-hidden shadow-2xl">
-                    <img src="https://pbs.twimg.com/community_banner_img/2021914355340886017/opbbiLxp?format=jpg&name=small" 
+                    <img src="https://i.postimg.cc/Rhj1vDWd/6f6f2144-399a-439e-a748-a7cb6e51a80d.jpg" 
                          alt="Mirumi Community Banner" 
                          class="w-full h-auto rounded-xl object-cover max-h-[380px] shadow-sm"
                          onerror="this.src='https://placehold.co/1200x400/fff0f5/ff2a85?text=MIRUMI+TOKYO+PLUSH+BOT+2026'">
-                    
-                    <div class="absolute bottom-4 left-4 right-4 flex flex-wrap items-center justify-between gap-2 bg-white/90 backdrop-blur-md p-3 rounded-xl border border-pink-200 shadow-md">
+
+                    <div class="mt-3 flex flex-wrap items-center justify-between gap-2 bg-white/90 backdrop-blur-md p-3 rounded-xl border border-pink-200 shadow-md">
                         <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-800 font-semibold">
                             <i class="fa-solid fa-users text-brand-hotPink"></i>
                             <span>Official X Community Banner</span>
@@ -1255,44 +1255,14 @@
             indicator.innerText = "Gemini AI generating image with Mirumi character... Please wait a moment ✨";
 
             try {
-                const apiKey = "";
-                // Visual character prompt anchor to strictly lock character identity to MIRUMI
-                const characterAnchor = "CHARACTER MANDATE (CRITICAL): The central subject MUST strictly be the character MIRUMI - Tokyo's official viral plush robot charm companion. Visual features that MUST be preserved: 1) Round pastel-pink plush body with soft plush texture, 2) Dark glossy robot screen face with glowing cyan digital eyes and cute smiling mouth, 3) Small grey metallic antenna on top, 4) Soft pink plush ears and stubby arms/legs. Always keep MIRUMI as the single main hero character. Do NOT invent different characters, humans, or unrelated mascots.";
-
-                const userPrompt = `${characterAnchor} Scene & Action: ${promptInput}. High quality 3D render, cute kawaii aesthetic, vibrant Tokyo ambient lighting.`;
-                
-                // Try imagen-4.0-generate-001
-                const payload = {
-                    instances: [{ prompt: userPrompt }],
-                    parameters: { sampleCount: 1 }
-                };
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
-
-                let response = await fetch(apiUrl, {
+                const response = await fetch('/api/gemini-image', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ prompt: promptInput })
                 });
 
-                let result = await response.json();
-                let base64Data = result?.predictions?.[0]?.bytesBase64Encoded;
-
-                // Fallback to gemini-3.1-flash-image-preview if needed
-                if (!base64Data) {
-                    const fallbackPayload = {
-                        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-                        generationConfig: { responseModalities: ['IMAGE'] }
-                    };
-                    const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key=${apiKey}`;
-                    response = await fetch(fallbackUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(fallbackPayload)
-                    });
-                    result = await response.json();
-                    const part = result?.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
-                    base64Data = part?.inlineData?.data;
-                }
+                const result = await response.json();
+                const base64Data = result?.base64;
 
                 if (base64Data) {
                     const img = new Image();
@@ -1325,37 +1295,15 @@
             showToast("Gemini AI writing viral captions...");
 
             try {
-                const apiKey = "";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-                const payload = {
-                    contents: [{ parts: [{ text: "Write 1 short viral meme top text and bottom text for $MIRUMI, Tokyo's viral plush robot charm on Solana. Return strictly JSON in form: {\"topText\": \"...\", \"bottomText\": \"...\"}" }] }],
-                    generationConfig: {
-                        responseMimeType: "application/json",
-                        responseSchema: {
-                            type: "OBJECT",
-                            properties: {
-                                topText: { type: "STRING" },
-                                bottomText: { type: "STRING" }
-                            },
-                            required: ["topText", "bottomText"]
-                        }
-                    }
-                };
-
-                const response = await fetch(apiUrl, {
+                const response = await fetch('/api/gemini-captions', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    headers: { 'Content-Type': 'application/json' }
                 });
-                const data = await response.json();
-                const jsonStr = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (jsonStr) {
-                    const parsed = JSON.parse(jsonStr);
-                    if (parsed.topText) document.getElementById('meme-top-text').value = parsed.topText;
-                    if (parsed.bottomText) document.getElementById('meme-bot-text').value = parsed.bottomText;
-                    drawMemeCanvas();
-                    showToast("Gemini Captions Applied!");
-                }
+                const parsed = await response.json();
+                if (parsed.topText) document.getElementById('meme-top-text').value = parsed.topText;
+                if (parsed.bottomText) document.getElementById('meme-bot-text').value = parsed.bottomText;
+                drawMemeCanvas();
+                showToast("Gemini Captions Applied!");
             } catch(err) {
                 console.error("Gemini Caption Error:", err);
                 showToast("Caption generation error.");

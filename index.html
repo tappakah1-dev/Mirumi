@@ -1199,16 +1199,12 @@
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Draw central Mirumi icon placeholder graphic
-                ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-                ctx.beginPath();
-                ctx.arc(250, 240, 110, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.font = "90px sans-serif";
+                // Draw placeholder text instead of a bear icon
+                ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+                ctx.font = "700 28px 'Fredoka', 'Outfit', sans-serif";
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
-                ctx.fillText("🧸", 250, 230);
+                ctx.fillText("Generate your meme", canvas.width / 2, canvas.height / 2);
             }
 
             // Draw Sticker

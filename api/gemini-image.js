@@ -1,5 +1,5 @@
 const CHARACTER_ANCHOR =
-  "CHARACTER MANDATE (CRITICAL): The central subject MUST strictly be the character MIRUMI - Tokyo's official viral plush robot charm companion. Visual features that MUST be preserved: 1) Round pastel-pink plush body with soft plush texture, 2) Dark glossy robot screen face with glowing cyan digital eyes and cute smiling mouth, 3) Small grey metallic antenna on top, 4) Soft pink plush ears and stubby arms/legs. Always keep MIRUMI as the single main hero character. Do NOT invent different characters, humans, or unrelated mascots.";
+  "CHARACTER MANDATE (CRITICAL): The central subject MUST strictly be the character MIRUMI - a real viral fluffy plush toy. Visual features that MUST be preserved exactly: 1) A round, pom-pom-shaped body made entirely of extremely soft, dense, fluffy fur with no visible seams, 2) Large round googly eyes - black pupils on a white/cream base, slightly offset like stuck-on craft eyes, 3) A tiny black button nose, no visible mouth, 4) No robot parts, no screen face, no antenna, no digital/glowing elements of any kind - MIRUMI is a plush fur creature, not a robot, 5) Short stubby fuzzy arms and legs barely poking out from the round fur body, 6) Comes in soft pastel fur colors such as blush pink, dove grey, or cream/ivory. Always keep MIRUMI as the single main hero character, exactly like a real plush toy photographed in a cute lifestyle setting. Do NOT invent robots, screens, antennas, different characters, humans, or unrelated mascots.";
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -12,9 +12,9 @@ module.exports = async (req, res) => {
 
     const promptInput =
       (req.body?.prompt || "").trim() ||
-      "drinking boba tea in Shibuya Tokyo with Solana coins raining from sky";
+      "holding a glowing Solana coin on a rocket ship blasting to the moon, crypto trading charts in the background";
 
-    const userPrompt = `${CHARACTER_ANCHOR} Scene & Action: ${promptInput}. High quality 3D render, cute kawaii aesthetic, vibrant Tokyo ambient lighting.`;
+    const userPrompt = `${CHARACTER_ANCHOR} Scene & Action: ${promptInput}. Include crypto/memecoin visual elements (Solana logo colors, coins, candlestick charts, "to the moon" energy, or a phone/laptop showing a green trading chart) worked naturally into the scene. High quality photo-real product shot, soft studio lighting, shallow depth of field, shot like a real plush toy lifestyle photo.`;
 
     // Try Imagen first
     const imagenUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${GEMINI_API_KEY}`;

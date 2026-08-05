@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
     const promptInput = (req.body?.prompt || "").trim();
 
     const sceneLine = promptInput
-      ? `Scene & Action: ${promptInput}.`
+      ? `Scene & Action: ${promptInput}. Interpret this literally and visually - actually depict the concepts, objects, and actions mentioned (e.g. if it mentions the moon, put MIRUMI on/near an actual moon in the scene; if it mentions diamond hands, show MIRUMI holding or surrounded by diamonds/gems; if it mentions a rocket, put a rocket in the scene). Don't just restate the words as text on a sign - build the actual scene around what's described.`
       : `Scene & Action: invent something yourself - a completely unexpected, wildly creative moment of MIRUMI celebrating a huge Solana pump.`;
 
     const userPrompt = `${CHARACTER_ANCHOR} ${sceneLine}

@@ -225,10 +225,12 @@
             <div class="relative max-w-4xl mx-auto mb-10 group">
                 <div class="absolute -inset-1 bg-gradient-to-r from-brand-pink via-brand-hotPink to-purple-400 rounded-3xl blur-md opacity-50 group-hover:opacity-80 transition duration-1000 group-hover:duration-200"></div>
                 <div class="relative glass-panel rounded-2xl p-2 sm:p-3 overflow-hidden shadow-2xl">
-                    <img src="https://i.postimg.cc/Rhj1vDWd/6f6f2144-399a-439e-a748-a7cb6e51a80d.jpg" 
-                         alt="Mirumi Community Banner" 
-                         class="w-full h-auto rounded-xl object-cover max-h-[380px] shadow-sm"
-                         onerror="this.src='https://placehold.co/1200x400/fff0f5/ff2a85?text=MIRUMI+TOKYO+PLUSH+BOT+2026'">
+                    <div class="overflow-hidden rounded-xl">
+                        <img src="https://i.postimg.cc/Rhj1vDWd/6f6f2144-399a-439e-a748-a7cb6e51a80d.jpg" 
+                             alt="Mirumi Community Banner" 
+                             class="w-full h-auto object-cover max-h-[380px] shadow-sm scale-[1.06]"
+                             onerror="this.src='https://placehold.co/1200x400/fff0f5/ff2a85?text=MIRUMI+TOKYO+PLUSH+BOT+2026'">
+                    </div>
 
                     <div class="mt-3 flex flex-wrap items-center justify-between gap-2 bg-white/90 backdrop-blur-md p-3 rounded-xl border border-pink-200 shadow-md">
                         <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-800 font-semibold">
@@ -698,7 +700,7 @@
                                 <span><i class="fa-solid fa-wand-magic-sparkles text-brand-hotPink"></i> Gemini AI Prompt</span>
                                 <span class="text-[10px] bg-brand-pink/20 text-brand-hotPink px-2 py-0.5 rounded-full font-bold">Mirumi Character Locked</span>
                             </div>
-                            <textarea id="gemini-prompt-input" rows="3" placeholder="Describe Mirumi's setting or activity... e.g. holding a Solana coin on a rocket to the moon" class="w-full bg-white border border-pink-200 rounded-xl p-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-pink resize-none shadow-sm"></textarea>
+                            <textarea id="gemini-prompt-input" rows="3" placeholder="Describe Mirumi's setting or activity... e.g. celebrating a huge Solana pump, crazy gains vibe" class="w-full bg-white border border-pink-200 rounded-xl p-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-pink resize-none shadow-sm"></textarea>
                             
                             <button id="gemini-gen-btn" onclick="generateGeminiMemeImage()" class="w-full bg-gradient-to-r from-brand-pink to-brand-hotPink hover:from-brand-hotPink hover:to-rose-600 text-white font-bold py-2.5 px-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 text-xs">
                                 <i id="gemini-spinner" class="fa-solid fa-spinner fa-spin hidden"></i>
@@ -715,17 +717,9 @@
                             </button>
                         </div>
 
-                        <h3 class="font-bold text-slate-700 text-xs border-b border-pink-100 pb-1.5 pt-1 uppercase tracking-wider">Backdrop Style</h3>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button onclick="setMemeBg('pink')" class="p-2.5 rounded-xl bg-pink-100 hover:bg-pink-200 border border-pink-300 text-xs font-bold text-pink-900">Tokyo Pink</button>
-                            <button onclick="setMemeBg('cyber')" class="p-2.5 rounded-xl bg-purple-100 hover:bg-purple-200 border border-purple-300 text-xs font-bold text-purple-900">Cyber Night</button>
-                            <button onclick="setMemeBg('solana')" class="p-2.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 text-xs font-bold text-emerald-900">Solana Green</button>
-                            <button onclick="setMemeBg('gold')" class="p-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 border border-amber-300 text-xs font-bold text-amber-900">Gold Moon</button>
-                        </div>
-
                         <h3 class="font-bold text-slate-700 text-xs border-b border-pink-100 pb-1.5 pt-1 uppercase tracking-wider">Custom Text</h3>
-                        <input type="text" id="meme-top-text" oninput="drawMemeCanvas()" value="" placeholder="Top Text..." class="w-full bg-white border border-pink-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-brand-pink shadow-sm">
-                        <input type="text" id="meme-bot-text" oninput="drawMemeCanvas()" value="" placeholder="Bottom Text..." class="w-full bg-white border border-pink-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-brand-pink shadow-sm">
+                        <input type="text" id="meme-top-text" oninput="drawMemeCanvas()" value="LABUBU IS OUT" placeholder="Top Text..." class="w-full bg-white border border-pink-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-brand-pink shadow-sm">
+                        <input type="text" id="meme-bot-text" oninput="drawMemeCanvas()" value="MIRUMI IS IN 🌸" placeholder="Bottom Text..." class="w-full bg-white border border-pink-200 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-brand-pink shadow-sm">
 
                         <h3 class="font-bold text-slate-700 text-xs border-b border-pink-100 pb-1.5 pt-1 uppercase tracking-wider">Sticker Badge</h3>
                         <div class="flex flex-wrap gap-1.5">
@@ -1151,14 +1145,8 @@
         }
 
         // Canvas & Gemini AI Meme Generator Logic
-        let memeBgStyle = 'pink';
         let memeSticker = '100x';
         let aiLoadedImage = null;
-
-        function setMemeBg(style) {
-            memeBgStyle = style;
-            drawMemeCanvas();
-        }
 
         function setSticker(sticker) {
             memeSticker = sticker;
@@ -1183,19 +1171,8 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             } else {
                 let grad = ctx.createLinearGradient(0, 0, 500, 500);
-                if (memeBgStyle === 'pink') {
-                    grad.addColorStop(0, '#fff0f5');
-                    grad.addColorStop(1, '#ff5c9d');
-                } else if (memeBgStyle === 'cyber') {
-                    grad.addColorStop(0, '#f3e8ff');
-                    grad.addColorStop(1, '#9333ea');
-                } else if (memeBgStyle === 'solana') {
-                    grad.addColorStop(0, '#ecfdf5');
-                    grad.addColorStop(1, '#10B981');
-                } else if (memeBgStyle === 'gold') {
-                    grad.addColorStop(0, '#fffbeb');
-                    grad.addColorStop(1, '#f59e0b');
-                }
+                grad.addColorStop(0, '#fff0f5');
+                grad.addColorStop(1, '#ff5c9d');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -1241,7 +1218,7 @@
 
         // Gemini AI Image Generator
         async function generateGeminiMemeImage() {
-            const promptInput = document.getElementById('gemini-prompt-input').value.trim() || "holding a glowing Solana coin on a rocket ship blasting to the moon, crypto trading charts in the background";
+            const promptInput = document.getElementById('gemini-prompt-input').value.trim() || "celebrating a huge Solana pump, crazy gains vibe";
             const btn = document.getElementById('gemini-gen-btn');
             const spinner = document.getElementById('gemini-spinner');
             const indicator = document.getElementById('ai-status-indicator');

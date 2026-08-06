@@ -26,7 +26,7 @@
                     },
                     fontFamily: {
                         sans: ['Outfit', 'Inter', 'sans-serif'],
-                        display: ['Fredoka', 'Outfit', 'sans-serif']
+                        display: ['Super Bouncer', 'Fredoka', 'Outfit', 'sans-serif']
                     },
                     animation: {
                         'float': 'float 3s ease-in-out infinite',
@@ -71,6 +71,14 @@
 
     <!-- Custom inline CSS overrides -->
     <style>
+        @font-face {
+            font-family: 'Super Bouncer';
+            src: url('fonts/SuperBouncer.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
         body {
             background-color: #fffafc;
             color: #2d1b2e;
@@ -187,7 +195,7 @@
                 <a href="https://x.com/i/communities/2008814431724020145" target="_blank" rel="noopener noreferrer" class="bg-slate-100 hover:bg-slate-200 text-slate-900 p-2.5 rounded-full border border-pink-200 hover:border-brand-pink transition-all flex items-center justify-center hover:scale-105" title="X Community">
                     <i class="fa-brands fa-x-twitter text-lg"></i>
                 </a>
-                <a href="#dex-chart" class="bg-gradient-to-r from-brand-pink to-brand-hotPink hover:from-brand-hotPink hover:to-rose-600 text-white font-bold px-4 sm:px-5 py-2.5 rounded-full shadow-lg hover:shadow-brand-pink/40 transition-all transform hover:-translate-y-0.5 text-xs sm:text-sm flex items-center gap-2">
+                <a href="https://trade.padre.gg/rk/pumpref" target="_blank" rel="noopener noreferrer" class="bg-gradient-to-r from-brand-pink to-brand-hotPink hover:from-brand-hotPink hover:to-rose-600 text-white font-bold px-4 sm:px-5 py-2.5 rounded-full shadow-lg hover:shadow-brand-pink/40 transition-all transform hover:-translate-y-0.5 text-xs sm:text-sm flex items-center gap-2">
                     <i class="fa-solid fa-chart-line"></i>
                     <span>BUY $MIRUMI</span>
                 </a>
@@ -264,11 +272,15 @@
 
             <!-- CTA Button Row -->
             <div class="flex flex-wrap items-center justify-center gap-4">
+                <a href="https://trade.padre.gg/rk/pumpref" target="_blank" rel="noopener noreferrer" class="bg-gradient-to-r from-brand-pink to-brand-hotPink hover:from-brand-hotPink hover:to-rose-600 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-brand-pink/40 transition-all transform hover:-translate-y-1 flex items-center gap-3 text-base">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>BUY HERE</span>
+                </a>
                 <a href="https://x.com/i/communities/2008814431724020145" target="_blank" rel="noopener noreferrer" class="bg-white hover:bg-pink-50 text-slate-900 font-bold px-8 py-4 rounded-2xl border border-brand-pink/40 hover:border-brand-pink transition-all shadow-md hover:shadow-brand-pink/20 transform hover:-translate-y-1 flex items-center gap-3 text-base">
                     <i class="fa-brands fa-x-twitter text-xl text-brand-hotPink"></i>
                     <span>X Community Hub</span>
                 </a>
-                <a href="#pet-mirumi" class="bg-gradient-to-r from-brand-pink to-brand-hotPink hover:from-brand-hotPink hover:to-rose-600 text-white font-bold px-8 py-4 rounded-2xl shadow-xl hover:shadow-brand-pink/40 transition-all transform hover:-translate-y-1 flex items-center gap-3 text-base">
+                <a href="#pet-mirumi" class="bg-white hover:bg-pink-50 text-slate-900 font-bold px-8 py-4 rounded-2xl border border-brand-pink/40 hover:border-brand-pink transition-all shadow-md hover:shadow-brand-pink/20 transform hover:-translate-y-1 flex items-center gap-3 text-base">
                     <span>👾 Tamagotchi Mode</span>
                     <i class="fa-solid fa-arrow-down"></i>
                 </a>
@@ -660,7 +672,7 @@
 
                         <div class="bg-gradient-to-r from-pink-100 via-rose-100 to-purple-100 p-4 rounded-2xl border border-brand-pink/50 flex items-center justify-between shadow-md">
                             <div class="flex items-center gap-3">
-                                <span class="text-3xl animate-bounce-slow">🧸</span>
+                                <img src="https://i.postimg.cc/NMBzcL3x/e18a8e15-392f-4925-a629-43fcd2be9fec.jpg" alt="Mirumi" class="w-12 h-12 rounded-full object-cover animate-bounce-slow shadow-sm">
                                 <div>
                                     <div class="font-bold text-slate-900 text-base flex items-center gap-2">
                                         <span>2026: MIRUMI ROBOT</span>
@@ -882,7 +894,7 @@
     <footer class="py-12 border-t border-pink-200 bg-white/80 relative">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <div class="flex items-center justify-center gap-3 mb-4">
-                <span class="text-3xl">🧸</span>
+                <img src="https://i.postimg.cc/NMBzcL3x/e18a8e15-392f-4925-a629-43fcd2be9fec.jpg" alt="Mirumi" class="w-10 h-10 rounded-full object-cover shadow-sm">
                 <span class="font-display text-2xl font-bold tracking-wider text-slate-900">$MIRUMI</span>
             </div>
             <p class="text-xs text-slate-500 max-w-xl mx-auto mb-6 leading-relaxed">
@@ -1190,7 +1202,7 @@
             }
 
             const maxTextWidth = canvas.width - 40; // 20px padding each side
-            const fontSpec = (size) => `900 ${size}px 'Fredoka', 'Impact', sans-serif`;
+            const fontSpec = (size) => `900 ${size}px 'Super Bouncer', 'Fredoka', 'Impact', sans-serif`;
 
             // Draw Top Text
             const topText = document.getElementById('meme-top-text').value.toUpperCase();
